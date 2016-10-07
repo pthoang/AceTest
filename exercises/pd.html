@@ -1,0 +1,64 @@
+
+<div class="container-fluid" ng-if="exerciseNumber == activeExercise">
+    <div class="row">
+        <div class="col-xs-1">
+            <span class="glyphicon glyphicon-question-sign" style="font-size: 25px; margin-top: 5px"></span>
+        </div>
+        <div class="col-xs-11">
+            <textarea id="activeQuestion" msd-elastic class="open-text-input textarea-edit" rows="1" ng-model="exercise.content.question.text" placeholder="Frase">
+            </textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-1">
+            <span class="glyphicon glyphicon-ok-sign" style="font-size: 25px; margin-top: 5px"></span>
+        </div>
+        <div class="col-xs-11">
+            <textarea msd-elastic class="open-text-input textarea-edit" rows="1" ng-model="exercise.content.correct.answer" placeholder="Definisjon">
+            </textarea>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-xs-1">
+            <span class="glyphicon glyphicon-tags" style="font-size: 25px; margin-top: 15px"></span>
+        </div>
+        <div class="col-xs-11">
+            <tags-input class="tags-input"
+                        placeholder="Tags"
+                        ng-model="exercise.content.tags"
+                        min-length="1"
+                        addOnEnter="true">
+                <!--<auto-complete source="getTagSuggestions()"-->
+                <!--minLength="2"-->
+                <!--maxResultsToShow="5"-->
+                <!--max-results-to-show="32"-->
+                <!--&gt;</auto-complete>-->
+            </tags-input>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid" ng-if="exerciseNumber != activeExercise">
+    <div class="row" style="margin-bottom: 10px">
+        <div class="col-xs-12">
+            <h4>{{exercise.content.question.text}}</h4>
+        </div>
+    </div>
+    <div class="row" style="margin-bottom: 10px">
+        <div class="col-xs-1">
+            <span class="glyphicon glyphicon-ok" style="font-size: 15px;">
+            </span>
+        </div>
+        <div class="col-xs-11">
+            <h5 style="margin-top: 0; font-size: 15px">{{exercise.content.correct.answer}}</h5>
+        </div>
+    </div>
+    <div class="row">
+        <div class="container-fluid">
+            <label class="btn" style="cursor: default; background-color: white; border-color: black; pointer-events: none; margin-right: 2px"
+                   ng-repeat="tag in exercise.content.tags track by $index">{{tag.text}}</label>
+        </div>
+    </div>
+</div>
+

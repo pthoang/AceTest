@@ -1,0 +1,51 @@
+<div class="container-fluid" align="center">
+    <div class="container-fluid div-card" style="width: 960px; margin-bottom: 20px">
+        <div class="row">
+            <div class="col-xs-3" style="background-color: cornflowerblue; height: 150px; cursor: pointer" ng-click="goBack()">
+                <h4 style="color: white"><i>Du legger til i ..... . Trykk her for å gå tilbake når
+                når du er ferdig!</i></h4>
+            </div>
+            <div class="col-xs-9">
+                <h3>Søk etter oppgaver og oppgavesett. Bruk hva enn du vil!</h3>
+                <br>
+                <div class="form-inline">
+                    <input class="form-control" style="width: 500px;" ng-model="searchTerms"
+                           ng-keypress="$event.keyCode==13 && searchItems()">
+                    <button class="btn btn-primary" style="width: 100px; background-color: cornflowerblue" ng-click="searchItems()">Søk</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div ng-if="resultList" style="width: 960px" align="left">
+        <div class="col-xs-3">
+            <div class="container-fluid div-card">
+                <h4 style="padding-bottom: 10px">Søker i:</h4>
+                <div class="row">
+                    <div class="col-xs-6">
+                        <h4 ng-if="searchPath == 'collections'">Sett</h4>
+                        <h4 ng-if="searchPath == 'exercises'">Oppgaver</h4>
+                    </div>
+                    <div class="col-xs-6" align="right">
+                        <h4>{{resultList.length}}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-9 div-card">
+            <div ng-if="searchPath == 'collections'" ng-include="'search/collections.html'"></div>
+            <div ng-if="searchPath == 'exercises'" ng-include="'search/exercises.html'"></div>
+            <div ng-if="resultList.length == 0" class="container-fluid" align="center">
+                <p><i>Ingen resultater...</i></p>
+            </div>
+        </div>
+    </div>
+    <div ng-show="resultList" class="container-fluid" style="width: 960px">
+        <div class="col-xs-3">
+        </div>
+        <div class="col-xs-9" align="center">
+            <ul class="pagination-sm" uib-pagination total-items="resultList.length"
+                ng-model="currentPage" max-size="5" next-text="Neste" previous-text="Forrige"></ul>
+        </div>
+    </div>
+</div>

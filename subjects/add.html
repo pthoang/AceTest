@@ -1,0 +1,64 @@
+
+<div class="container-fluid" align="center" style="width: 960px;">
+
+
+    <div class="col-lg-6">
+        <div ng-hide="editNew" class="container-fluid" align="left">
+            <h2>Søk:</h2>
+            <input class="form-control" type="text" ng-model="searchTerm" uib-typeahead="subject as subject.code+', '+subject.name for subject in searchSubjects($viewValue)"
+                   typeahead-popup-template-url="subjectSearchResult.html" typeahead-on-select="selectedSubject($item)" placeholder="Skriv inn fagkode..." >
+        </div>
+        <div ng-show="editNew" class="container-fluid" align="left">
+            <h2>Opprett ny</h2>
+            <h4>Fagkode:</h4>
+            <input ng-model="newCode" class="form-control">
+            <h4>Fagnavn:</h4>
+            <input id="newName" ng-model="newName" class="form-control" ng-keypress="$event.keyCode == 13 && saveNew()">
+            <div class="btn-group" style="margin-top: 30px; float:right;">
+                <button class="btn btn-default" ng-click="saveNew()">
+                    <span class="glyphicon glyphicon-floppy-disk"></span>
+                </button>
+                <button class="btn btn-default" ng-click="cancelNew()">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6" style="display:inline-block;">
+        <h2 style="display:inline-block;">Anbefalte fag</h2>
+        <button class="btn btn-default" ng-repeat="item in items | limitTo:quantity" style="width: 100%; height: 100px" ng-click="openAddSubjectModal(item)">
+            <h4>{{item.code}}</h4>
+            <h4 ng-if="item.name != 'Unnamed'">{{item.name}}</h4>
+        </button>
+    </div>
+    <div class="container-fluid" style="margin:50px;">
+
+    </div>
+
+</div>
+<!--<script type="text/ng-template" id="subjectSearchResult.html">-->
+    <!--<div class="dropdown-menu" ng-show="isOpen() && !moveInProgress" ng-style="{top: position().top+'px', left: position().left+'px'}" role="listbox" aria-hidden="{{!isOpen()}}">-->
+        <!--<li class="uib-typeahead-match" ng-repeat="match in matches track by $index" ng-class="{active: isActive($index) }" ng-mouseenter="selectActive($index)"-->
+            <!--ng-click="selectMatch($index, $event)" role="option" id="{{::match.id}}">-->
+            <!--<hr ng-if="$last">-->
+            <!--<div uib-typeahead-match index="$index" match="match" query="query" template-url="templateUrl"></div>-->
+        <!--</li>-->
+    <!--</div>-->
+<!--</script>-->
+
+<!--<script type="text/ng-template" id="addSubjectModal.html">-->
+    <!--<div class="modal-header">-->
+        <!--<h3>{{subject.code}}, {{subject.name}}</h3>-->
+    <!--</div>-->
+    <!--<div class="modal-body">-->
+        <!--<ul ng-repeat="collection in subject.collections">-->
+            <!--<li>{{collection.name}}, Antall oppgaver: {{collection.exercises.length}}</li>-->
+        <!--</ul>-->
+    <!--</div>-->
+    <!--<div class="modal-footer">-->
+        <!--<button class="btn btn-primary" type="button" ng-click="addSubject(true)">Inkluder alle sett</button>-->
+        <!--<button class="btn btn-primary" type="button" ng-click="addSubject(false)">Start blankt</button>-->
+        <!--<button class="btn btn-default" type="button" ng-click="cancel()">Avbryt</button>-->
+    <!--</div>-->
+<!--</script>-->

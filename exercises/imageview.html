@@ -1,0 +1,11 @@
+<div ng-if="exercise.content.question.image" class="container-fluid" align="center">
+    <div ng-if="exerciseNumber == activeExercise" class="container-fluid">
+        <img ng-mouseenter="mouseoverImage[exerciseNumber]=true" ng-mouseleave="mouseoverImage[exerciseNumber]=false"
+             ng-src="{{getImage(exercise.content.question.image)}}" style="height: 140px; cursor: pointer" ng-click="removeImage(exerciseNumber)">
+        <p ng-show="mouseoverImage[exerciseNumber]" style="margin-bottom: -20px"><em>Klikk på bildet for å fjerne det</em></p>
+    </div>
+    <div ng-if="exerciseNumber != activeExercise" class="container-fluid">
+        <img ng-src="{{getImage(exercise.content.question.image)}}" style="height: 140px;">
+    </div>
+    <hr>
+</div>

@@ -1,0 +1,55 @@
+<div ng-if="exerciseNumber == activeExercise" class="container-fluid" style="margin-top: 25px">
+
+    <div class="row">
+        <!--<div class="col-xs-12" style="margin-top: -5px; border-right: thin solid #F1F1F2;">-->
+        <div class="col-xs-1">
+            <span class="glyphicon glyphicon-info-sign" style="font-size: 25px; margin-top: 5px">
+            </span>
+        </div>
+        <div class="col-xs-11">
+            <textarea msd-elastic class="open-text-input textarea-edit" placeholder="Valgfri forklaring"
+                      rows="1" ng-model="exercise.content.explanation.text"
+                      ng-keydown="$event.keyCode == 9 && tabNextExercise()"></textarea>
+        </div>
+        <!--<div class="col-xs-4" style="margin-top: -5px;">-->
+            <!--<h4 ng-show="exercise.content.question.image">Bytt bilde</h4>-->
+            <!--<h4 ng-show="!exercise.content.question.image">Legg til bilde</h4>-->
+            <!--<input id="{{exerciseNumber}}" class="form-control" type="file" ng-model="files" name="files" style="margin-top: 5px;"-->
+                   <!--base-sixty-four-input on-after-validate="onChangeHandler(exercise)"-->
+                   <!--accept="image/*">-->
+        <!--</div>-->
+    </div>
+
+    <!--<div class="row" style="margin-bottom: 10px">-->
+    <!--<div class="col-lg-1">-->
+    <!--<a style="cursor: pointer" ng-click="extraProperty[exerciseNumber]='image'">Bilde</a>-->
+    <!--</div>-->
+    <!--<div class="col-lg-1">-->
+    <!--<a style="cursor: pointer" ng-click="extraProperty[exerciseNumber]='explanation'">Forklaring</a>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--<div ng-if="extraProperty[exerciseNumber]=='image'" class="row">-->
+    <!--<div class="col-lg-1">-->
+    <!--<h4>Bilde:</h4>-->
+    <!--</div>-->
+    <!--<div class="col-lg-7">-->
+    <!--<input id="{{exerciseNumber}}" class="form-control" type="file" ng-model="files" name="files" style="margin-top: 5px;"-->
+    <!--base-sixty-four-input on-after-validate="onChangeHandler(exercise)"-->
+    <!--accept="image/*">-->
+    <!--</div>-->
+    <!--<div class="col-lg-4">-->
+    <!--<div style="margin-top:10px;">-->
+    <!--<a style="cursor:pointer;" ng-click="removeImage(exerciseNumber)" ng-if="exercise.image"><em>Fjern bilde</em></a>-->
+    <!--</div>-->
+    <!--</div>-->
+
+    <!--</div>-->
+    <!--<div ng-if="extraProperty[exerciseNumber]=='explanation'" class="row">-->
+    <!--<div class="col-lg-2">-->
+    <!--<h4>Forklaring:</h4>-->
+    <!--</div>-->
+    <!--<div class="col-lg-10">-->
+    <!--<textarea msd-elastic class="form-control textarea-edit" rows="1" ng-model="exercise.explanation"></textarea>-->
+    <!--</div>-->
+    <!--</div>-->
+</div>

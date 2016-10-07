@@ -1,0 +1,35 @@
+<div class="container-fluid div-card" align="center" style="position:relative;width: 480px; background-color: white;margin-top: 75px" >
+    <div class="container" style="margin-bottom: 30px"></div>
+
+    <h3>Logg inn</h3>
+
+    <div class="row">
+            <!--<h3 style="display:inline-block;margin-right:10px;">Username</h3>-->
+
+            <input placeholder="username" class="form-control" style="display:inline-block;border: 2px solid transparent;
+border-radius: 3px;background-color: #ECF0F1;width: 300px; margin-top: 0px" ng-model="username" ng-keypress="$event.keyCode==13 && authenticate()" align="center">
+
+
+
+    </div>
+    <div class="row">
+            <!--<h3 style="display:inline-block;margin-right:10px;">Password</h3>-->
+
+            <input placeholder="password" class="form-control" type="password" ng-model="password" ng-keypress="$event.keyCode==13 && authenticate()" style="display:inline-block;border: 2px solid transparent;
+border-radius: 3px;background-color: #ECF0F1;width: 300px; margin-top: 10px" align="center">
+
+
+    </div>
+    <br>
+    <div class="container-fluid" ng-show="error">
+        <p style="color: red">{{errorMessage}}</p>
+
+    </div>
+    <button class="btn btn-primary" ng-click="authenticate()" style="margin-bottom:10px;width:200px;">
+        Logg inn
+    </button>
+
+    <div class="container-fluid" style="margin-bottom: 20px">
+        <a href="#/register">Registrer deg her</a>
+    </div>
+</div>

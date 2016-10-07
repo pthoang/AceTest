@@ -1,0 +1,52 @@
+<div ng-repeat="result in getResults()" >
+    <div ng-if="!addedCollections[result.collection.id]" class="row" ng-click="openCollectionModal(result.collection)"
+         style="padding-bottom: 15px;border-bottom: 1px solid #cccccc; cursor: pointer;">
+        <div class="col-xs-11">
+            <div class="container-fluid">
+                <h3>{{result.collection.name}}</h3>
+                <p>{{result.subject.name}}({{result.subject.code}})</p>
+            </div>
+        </div>
+        <div class="col-xs-1">
+            <span class="glyphicon glyphicon-plus" ng-click="$event.stopPropagation(); addCollection(result.collection)"
+                  style="color: royalblue; font-size: 30px; margin-top: 100%"></span>
+        </div>
+    </div>
+    <div ng-if="addedCollections[result.collection.id]" class="row"
+         style="padding-bottom: 15px;border-bottom: 1px solid #ccc; background-color: lightgrey">
+        <div class="col-xs-11">
+            <div class="container-fluid">
+                <h3>{{result.collection.name}}</h3>
+                <p>{{result.subject.name}}({{result.subject.code}})</p>
+            </div>
+        </div>
+        <div class="col-xs-1">
+            <span class="glyphicon glyphicon-ok" ng-click="removeCollection(result.collection)"
+                  style="color: royalblue; font-size: 30px; margin-top: 100%; cursor: pointer"></span>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="collectionModal.html">
+    <div class="modal-body" align="left">
+        <h3>Velg oppgaver du vil legge til</h3>
+        <br>
+        <div class="container-fluid" style="height: 600px; overflow-y: scroll;">
+            <div ng-repeat="exercise in exercises track by $index" align="left"
+                 ng-style="addExercises[exercise.id] ?
+                 {'background-color': 'lightgrey', 'border-bottom':'1px solid #cccccc'}:
+                 {'border-bottom':'1px solid #cccccc'}">
+                <div class="container-fluid" ng-click="chosenExercise(exercise)" style="cursor: pointer">
+                    <div ng-if="exercise.type == 'mc'" ng-include="'search/mc.html'"></div>
+                    <div ng-if="exercise.type == 'pd'" ng-include="'search/pd.html'"></div>
+                    <div ng-if="exercise.type == 'tf'" ng-include="'search/tf.html'"></div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid" align="center">
+            <button class="btn btn-default" ng-click="addSelected()">Legg til valgte</button>
+            <button class="btn btn-default" ng-click="addAll()">Legg til alle</button>
+            <button class="btn btn-default" ng-click="close()">Avbryt</button>
+        </div>
+    </div>
+</script>

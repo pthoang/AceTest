@@ -1,0 +1,41 @@
+
+<div class="container-fluid" ng-if="exerciseNumber == activeExercise">
+    <div class="row">
+        <div class="col-xs-1">
+            <span class="glyphicon glyphicon-question-sign" style="font-size: 25px; margin-top: 5px"></span>
+        </div>
+        <div class="col-xs-11">
+            <textarea id="activeQuestion" msd-elastic class="open-text-input textarea-edit" rows="1" ng-model="exercise.content.question.text" placeholder="Oppgave">
+            </textarea>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-1">
+        </div>
+        <div class="col-xs-11">
+            <div class="btn-group" style="margin-top:4px">
+                <label class="btn btn-default" ng-model="exercise.content.correct.answer" uib-btn-radio="true" style="margin-top: 2px;" >
+                    <span class="glyphicon glyphicon-ok-sign" style="font-size: 25px;"></span>
+                </label>
+                <label class="btn btn-default" ng-model="exercise.content.correct.answer" uib-btn-radio="false" style="margin-top: 2px;">
+                    <span class="glyphicon glyphicon-remove-sign" style="font-size: 25px;"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid" ng-if="exerciseNumber != activeExercise">
+    <div class="row">
+        <div ng-show="exercise.content.correct.answer == true" class="col-xs-1">
+            <span class="glyphicon glyphicon-ok" style="font-size: 20px; margin-top: 7px"></span>
+        </div>
+        <div ng-show="exercise.content.correct.answer == false" class="col-xs-1">
+            <span class="glyphicon glyphicon-remove" style="font-size: 20px; margin-top: 7px"></span>
+        </div>
+        <div class="col-xs-11">
+            <h4>{{exercise.content.question.text}}</h4>
+        </div>
+    </div>
+
+</div>

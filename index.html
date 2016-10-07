@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="en" ng-app="myApp" class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html lang="en" ng-app="myApp" class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Mikail's Miracle Child</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/normalize.css">
+  <link rel="stylesheet" href="bower_components/html5-boilerplate/dist/css/main.css">
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="bower_components/ng-tags-input/ng-tags-input.css">
+  <link rel="stylesheet" href="bower_components/ng-material-floating-button/mfb/dist/mfb.css">
+  <link rel="stylesheet" href="bower_components/Ionicons/css/ionicons.css">
+  <link rel="stylesheet" href="components/font-awesome-4.6.3/css/font-awesome.min.css">
+  <link rel='stylesheet' href="bower_components/ng-sortable/dist/ng-sortable.min.css">
+  <link rel="stylesheet" href="bower_components/angular-ui-switch/angular-ui-switch.min.css"/>
+  <link rel="stylesheet" type="text/css" href="bower_components/sweetalert/dist/sweetalert.css">
+  <link rel="stylesheet" href="bower_components/alertifyjs/dist/css/alertify.css" id="alertifyCSS">
+  <link rel='stylesheet' href='bower_components/angular-loading-bar/src/loading-bar.css' type='text/css' media='all' />
+
+  <script src="bower_components/html5-boilerplate/dist/js/vendor/modernizr-2.8.3.min.js"></script>
+</head>
+
+
+<nav class="navbar navbar-default" style="background-color: white">
+  <div class="container-fluid" ng-style="mobileNav()? {'width': '960px'}: {'width': '100%'}">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" ng-click="isCollapsed = !isCollapsed">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#/subjects"><img ng-click="resetMain()" src="img/ace.png" style="width: 100px;"></a>
+    </div>
+    <div uib-collapse="isCollapsed" class="navbar-collapse bs-js-navbar-collapse" ng-controller="mainController">
+      <ul style="width: 80%" class="nav navbar-nav">
+          <li><a href="#/subjects">Forside</a></li>
+          <li ng-show="checkLoggedIn()"><a style="cursor:pointer;" ng-click="logOut()">Logg ut</a></li>
+          <li ng-show="!checkLoggedIn()"><a href="#/login">Logg inn</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<body style="background-color: #F1F1F2;">
+
+  <div ng-view autoscroll="true"></div>
+
+  <!--<div>Angular seed app: v<span app-version></span></div>-->
+
+  <!-- In production use:
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/x.x.x/angular.min.js"></script>
+  -->
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="bower_components/angular-route/angular-route.js"></script>
+  <!--<script src="services/rest-service.js"></script>-->
+  <script src="app.js"></script>
+  <script src="subjects/subjects.js"></script>
+  <script src="subjects/add.js"></script>
+  <script src="login/login.js"></script>
+  <script src="collections/collections.js"></script>
+  <script src="search/addcollections.js"></script>
+  <script src="search/addexercises.js"></script>
+  <script src="exercises/edit.js"></script>
+  <script src="services/rest-service.js"></script>
+  <script src="components/version/version.js"></script>
+  <script src="components/version/version-directive.js"></script>
+  <script src="components/version/interpolate-filter.js"></script>
+  <script src="bower_components/ng-tags-input/ng-tags-input.js"></script>
+  <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+  <script src="bower_components/angular-bootstrap-checkbox/angular-bootstrap-checkbox.js"></script>
+  <script src="bower_components/angular-base64/angular-base64.js"></script>
+  <script src="bower_components/angular-animate/angular-animate.js"></script>
+  <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+  <script src="bower_components/ng-material-floating-button/src/mfb-directive.js"></script>
+  <script src="bower_components/angular-ui-switch/angular-ui-switch.min.js"></script>
+  <script src="bower_components/ng-sortable/dist/ng-sortable.js"></script>
+  <script src="bower_components/angular-base64-upload/dist/angular-base64-upload.min.js"></script>
+  <script src="bower_components/sweetalert/dist/sweetalert.min.js"></script>
+  <script src="bower_components/alertifyjs/dist/js/ngAlertify.js"></script>
+  <script src="bower_components/angular-elastic/elastic.js"></script>
+  <script src="bower_components/angular-loading-bar/src/loading-bar.js"></script>
+  <script src="ajv/dist/ajv.min.js"></script>
+  <script src="schemas/helper.js"></script>
+  <script src="schemas/multiple-choice.js"></script>
+  <script src="schemas/phrase-definition.js"></script>
+  <script src="schemas/true-false.js"></script>
+
+
+</body>
+</html>

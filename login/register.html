@@ -1,0 +1,30 @@
+<div class="container-fluid" style="width: 960px; background-color: white">
+    <div class="container-fluid" style="width: 70%">
+
+        <h2>Registrering</h2>
+        <form role="form">
+            <div class="form-group">
+                <label>E-mail:</label>
+                <input type="email" class="form-control" ng-model="user.email">
+            </div>
+            <div class="form-group">
+                <label>Brukernavn:</label>
+                <input class="form-control" ng-model="user.username">
+            </div>
+            <div class="form-group">
+                <label>Passord:</label>
+                <input class="form-control" type="password" ng-model="user.password">
+                <label>Bekreft passord:</label>
+                <input class="form-control" type="password" ng-model="controlPassword">
+            </div>
+        </form>
+
+        <div ng-show="error" style="margin-bottom: 5px">
+            <p style="color: red">{{errorMessage}}</p>
+        </div>
+
+        <button class="btn btn-primary" style="margin-bottom: 20px" ng-click="completeRegister()">
+            Registrer
+        </button>
+    </div>
+</div>
