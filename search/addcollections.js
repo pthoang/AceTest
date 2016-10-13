@@ -5,17 +5,35 @@ angular.module('myApp.addcollections', ['ngRoute'])
         $scope.searchPath = 'collections';
         $scope.addedCollections = {};
         $scope.currentPage = 1;
+        $scope.subject = subjectService.getSubject();
 
         $scope.searchItems = function () {
             $http({
-                url: apiUrl + "/search/collections?search=" + $scope.searchTerms.replace(/[\s]/g, '_'),
+                url: apiUrl + "/search?q=" + $scope.searchTerms.replace(/[\s]/g, '_') + "&r=collections",
                 method: 'GET'
 
             }).success(function (response) {
+                console.log(response);
                 $scope.currentPage = 1;
                 $scope.resultList = response;
             })
         };
+
+        $scope.initSearch = function () {
+            $scope.addDestination = $scope.subject.name + " (" + $scope.subject.code + ")";
+            $scope.searchTerms = $scope.subject.name;
+            $scope.searchItems()
+        };
+
+        if(!$scope.subject) {
+            requestService.httpGet('/subjects/' + $routeParams.subjectId)
+                .then(function (response) {
+                    $scope.subject = response;
+                    $scope.initSearch()
+                })
+        } else {
+            $scope.initSearch()
+        }
 
         $scope.goBack = function () {
             $location.path('/subjects/' + $routeParams.subjectId)
@@ -64,28 +82,25 @@ angular.module('myApp.addcollections', ['ngRoute'])
         };
 
         $scope.openCollectionModal = function (collection) {
-            requestService.httpGet('/collections/'+collection.id+'/exercises').then(function (response) {
-                $scope.exercises = response;
-                var modalInstance = $uibModal.open({
-                    animation: true,
-                    templateUrl: 'collectionModal.html',
-                    controller: 'collectionModalCtrl',
-                    windowClass: 'app-modal-medium',
-                    resolve: {
-                        exercises: function () {
-                            return $scope.exercises
-                        },
-                        collection: function () {
-                            return collection
-                        }
+            var modalInstance = $uibModal.open({
+                animation: true,
+                templateUrl: 'collectionModal.html',
+                controller: 'collectionModalCtrl',
+                windowClass: 'app-modal-medium',
+                resolve: {
+                    exercises: function () {
+                        return collection.exercises
+                    },
+                    collection: function () {
+                        return collection
                     }
-                });
-
-                modalInstance.result.then(function (exercises) {
-                    console.log(exercises);
-                    $scope.addCollection(collection, exercises)
-                })
+                }
             });
+
+            modalInstance.result.then(function (exercises) {
+                console.log(exercises);
+                $scope.addCollection(collection, exercises)
+            })
         };
     })
     .controller('collectionModalCtrl', function ($scope, $uibModalInstance, exercises, collection) {

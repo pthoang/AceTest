@@ -1,4 +1,5 @@
 <div>
+    <p ng-style="addExercises[exercise.id]? {'color': 'black'}: {'color': 'lightgrey'}">True/False</p>
     <span ng-if="exercise.content.correct.answer" class="glyphicon glyphicon-ok" style="padding-right: 3px; font-size: 20px"></span>
     <span ng-if="!exercise.content.correct.answer" class="glyphicon glyphicon-remove" style="padding-right: 3px; font-size: 20px"></span>
     <span><h4 style="display:inline">{{exercise.content.question.text}}</h4></span>

@@ -204,7 +204,13 @@ body {
 
 }
 
+.search-result {
 
+}
+
+.search-result:hover {
+    background-color: lightgrey;
+}
 
 /*.repeat-item.ng-enter,*/
 /*.repeat-item.ng-leave {*/

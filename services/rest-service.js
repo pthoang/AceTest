@@ -55,7 +55,7 @@ angular.module("myApp.services", ['ngRoute'])
 
     })
     .service("requestService", function ($http, $q, $cookies, apiUrl, alertify) {
-        this.httpPut = function (path, data, errorList, index) {
+        this.httpPut = function (path, data) {
             return $q(function (resolve, reject) {
                 $http({
                     ignoreLoadingBar:true,
@@ -74,9 +74,6 @@ angular.module("myApp.services", ['ngRoute'])
                     if(status==500) {
                         alertify.error('Problemer med server')
                     };
-                    if(status==400 && errorList) {
-                        errorList[index] = true
-                    }
                     console.log(status);
                     reject({
                         response: response,
@@ -127,7 +124,7 @@ angular.module("myApp.services", ['ngRoute'])
                 })
             })
         };
-        this.httpPost = function (path, data, callback, errorList, index) {
+        this.httpPost = function (path, data, callback) {
             return $q(function (resolve, reject) {
                 $http({
                     url: apiUrl + path,
@@ -142,9 +139,6 @@ angular.module("myApp.services", ['ngRoute'])
                 }).error(function (response, status) {
                     if(status==500) {
                         alertify.error('Problemer med server')
-                    };
-                    if(status==400 && errorList) {
-                        errorList[index] = true
                     };
                     reject({
                         response: response,

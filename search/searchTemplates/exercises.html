@@ -1,0 +1,13 @@
+<div class="container-fluid" ng-click="openExerciseModal(result)">
+    <p style="color:lightgrey; margin-top: 10px">Oppgave</p>
+    <span style="font-size: 25px; font-weight: bold">{{result.content.question.text}}</span>
+    <p></p>
+</div>
+
+<script type="text/ng-template" id="exerciseModal.html">
+    <div class="container-fluid div-card" style="padding-top: 15px; padding-bottom: 15px">
+        <div ng-if="exercise.type=='mc'" ng-include="'exercises/mc.html'"></div>
+        <div ng-if="exercise.type=='pd'" ng-include="'exercises/pd.html'"></div>
+        <div ng-if="exercise.type=='tf'" ng-include="'exercises/tf.html'"></div>
+    </div>
+</script>

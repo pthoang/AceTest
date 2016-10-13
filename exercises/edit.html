@@ -1,4 +1,4 @@
-<div class="container-fluid" style="width: 100%" ng-click="choseActiveExercise(undefined)">
+<div class="container-fluid" style="width: 100%; height: 100vh" ng-click="choseActiveExercise(undefined)">
     <div id="mainDiv" class="container-fluid" style="width:960px">
         <h4 ng-click="backToSubjectPage()" style="color: cornflowerblue; cursor: pointer">Gå tilbake til {{subjectName}}</h4>
         <div ng-click="$event.stopPropagation(); setEditCollectionNameTrue()" class="container-fluid div-card header-exercises" style="width: 100%; margin-bottom: 20px;">
@@ -15,15 +15,21 @@
             </div>
         </div>
         <div>
-            <button class="btn btn-exercises" ng-click="$event.stopPropagation(); addExercise()">
-                <span class="glyphicon glyphicon-plus"></span> Ny oppgave
+            <button class="btn btn-exercises" ng-click="$event.stopPropagation(); addExercise('mc')">
+                Multiple Choice
             </button>
-            <button class="btn btn-exercises" ng-click="$event.stopPropagation(); saveCollection('goToAdd')">
-                <span class="glyphicon glyphicon-arrow-right"></span> Hent oppgaver
+            <button class="btn btn-exercises" ng-click="$event.stopPropagation(); addExercise('pd')">
+                Phrase-Definition
             </button>
-            <button ng-click="saveCollection('goToSubject')" ng-disabled="saveClicked" class="btn btn-exercises">
-                Lagre
+            <button class="btn btn-exercises" ng-click="$event.stopPropagation(); addExercise('tf')">
+                True/False
             </button>
+            <button class="btn btn-exercises" ng-click="$event.stopPropagation(); goToAddExercises()">
+                <span class="glyphicon glyphicon-circle-arrow-down"></span> Hent oppgaver
+            </button>
+            <!--<button ng-click="saveCollection('goToSubject')" ng-disabled="saveClicked" class="btn btn-exercises">-->
+                <!--Lagre-->
+            <!--</button>-->
         </div>
 
         <div id="editArea" style="width: 960px; margin-left: -15px" ng-click="$event.stopPropagation()">
@@ -31,27 +37,27 @@
                 <div class="container-fluid" as-sortable-item ng-repeat="exercise in collection.exercises track by $index"
                      ng-model="exercise" style="margin-bottom: 10px;">
                     <div class="container-fluid div-card" as-sortable-item-handle style="cursor: default; width: 100%; position: relative" ng-mouseenter="focused[$index] = true"
-                         ng-mouseleave="focused[$index] = false">
+                         ng-mouseleave="focused[$index] = false; confirmDelete[$index] = false">
                         <div class="container-fluid" style="margin-top: 30px"></div>
                         <div no-drag class="row" style="margin-bottom: 30px">
                             <div class="col-xs-11">
-                                <div no-drag align="right" style="position: absolute;top:-10px;right:-4px;" ng-show="isInErrorList($index)">
+                                <div no-drag align="right" style="position: absolute;top:-10px;right:-44px;" ng-show="isInErrorList($index)">
                                     <span class="glyphicon glyphicon-exclamation-sign"></span>
                                 </div>
 
                                 <div no-drag ng-click="choseActiveExercise($index)" class="container-fluid">
-                                    <div ng-if="$index == activeExercise" class="container-fluid" style="margin-bottom: 10px">
-                                        <div class="row">
-                                            <div class="col-lg-10">
-                                                <select id="typeBox" ng-change="changeDefault(exercise,$index)"
-                                                        ng-model="exercise.type"
-                                                        align="left" style="margin-top:10px">
-                                                    <option ng-repeat="x in types" value="{{x.type}}">{{x.desc}}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div ng-if="$index != activeExercise" class="container-fluid">
+                                    <!--<div ng-if="$index == activeExercise" class="container-fluid" style="margin-bottom: 10px">-->
+                                        <!--<div class="row">-->
+                                            <!--<div class="col-lg-10">-->
+                                                <!--<select id="typeBox" ng-change="changeDefault(exercise,$index)"-->
+                                                        <!--ng-model="exercise.type"-->
+                                                        <!--align="left" style="margin-top:10px">-->
+                                                    <!--<option ng-repeat="x in types" value="{{x.type}}">{{x.desc}}</option>-->
+                                                <!--</select>-->
+                                            <!--</div>-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                    <div ng-if="$index != activeExercise" class="container-fluid" style="margin-top: -20px">
                                         <p style="color: lightgrey;">{{typeDesc[exercise.type]}}</p>
                                     </div>
                                     <div onload="exerciseNumber = $index" ng-include="'exercises/imageview.html'"></div>
@@ -63,6 +69,9 @@
                                          onload="exerciseNumber = $index"></div>
                                     <div onload="exerciseNumber = $index" ng-include="'exercises/extrapropertyview.html'"></div>
                                 </div>
+                                <div ng-show="confirmDelete[$index]" class="container-fluid" style="position: absolute; bottom: -20px; right: -45px">
+                                    Klikk igjen for å bekrefte
+                                </div>
                                 <div no-drag class="container-fluid" style="position: absolute; bottom: -20px; right: -60px">
                                         <span ng-show="focused[$index] || activeExercise==$index" class="glyphicon glyphicon-trash"
                                               ng-click="deleteExercise($index)"
@@ -71,7 +80,7 @@
 
                             </div>
                         </div>
-                        <span class="glyphicon glyphicon-menu-hamburger" style="font-size: 25px; cursor: all-scroll;position: absolute; top: 46%; right: 3%"></span>
+                        <span ng-show="activeExercise==undefined" class="glyphicon glyphicon-menu-hamburger" style="font-size: 25px; cursor: all-scroll;position: absolute; top: 46%; right: 3%"></span>
                 </div>
 
             </div>
@@ -79,16 +88,22 @@
         </div>
     </div>
 
-    <div ng-show="collection.exercises.length > 3">
-        <button class="btn btn-exercises" ng-click="$event.stopPropagation(); addExercise()">
-            <span class="glyphicon glyphicon-plus"></span> Ny oppgave
+    <div ng-show="collection.exercises.length > 0">
+        <button class="btn btn-exercises" ng-click="$event.stopPropagation(); addExercise('mc')">
+            Multiple Choice
+        </button>
+        <button class="btn btn-exercises" ng-click="$event.stopPropagation(); addExercise('pd')">
+            Phrase-Definition
+        </button>
+        <button class="btn btn-exercises" ng-click="$event.stopPropagation(); addExercise('tf')">
+            True/False
         </button>
         <button class="btn btn-exercises" ng-click="$event.stopPropagation(); saveCollection('goToAdd')">
-            <span class="glyphicon glyphicon-arrow-right"></span> Hent oppgaver
+            <span class="glyphicon glyphicon-circle-arrow-down"></span> Hent oppgaver
         </button>
-        <button ng-click="saveCollection('goToSubject')" ng-disabled="saveClicked" class="btn btn-exercises">
-            Lagre
-        </button>
+        <!--<button ng-click="saveCollection('goToSubject')" ng-disabled="saveClicked" class="btn btn-exercises">-->
+            <!--Lagre-->
+        <!--</button>-->
     </div>
 
 

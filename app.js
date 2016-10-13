@@ -10,6 +10,7 @@ angular.module('myApp', [
         'myApp.collections',
         'myApp.addcollections',
         'myApp.addexercises',
+        'myApp.search',
         'myApp.edit',
         'ngAnimate',
         'ui.bootstrap',
@@ -59,6 +60,10 @@ angular.module('myApp', [
                 templateUrl: "search/add.html",
                 controller: "addExercisesCtrl"
             })
+            .when("/search", {
+                templateUrl: "search/search.html",
+                controller: "searchCtrl"
+            })
             .otherwise({redirectTo: '/login'});
 
 
@@ -94,6 +99,7 @@ angular.module('myApp', [
                 $location.path('/login');
             }
         };
+
     })
 
     .constant("apiUrl", "https://acepi-test2.herokuapp.com")

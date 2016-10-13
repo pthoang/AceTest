@@ -1,0 +1,21 @@
+<div class="container-fluid" ng-click="openCollectionModal(result)">
+    <p style="color: lightgrey; margin-top: 10px">Oppgavesett</p>
+    <span style="font-size: 25px; font-weight: bold">{{result.name}}</span>
+    <p>Antall oppgaver: {{result.exercises.length}}</p>
+</div>
+
+<script type="text/ng-template" id="collectionModal.html">
+    <div class="modal-body" align="left">
+        <span style="font-size: 25px; font-weight: bold">{{collection.name}}</span>
+        <div class="container-fluid" style="height: 600px; overflow-y: scroll;">
+            <div ng-repeat="exercise in exercises track by $index" align="left"
+                 style="border-bottom: 1px solid #cccccc">
+                <div class="container-fluid">
+                    <div ng-if="exercise.type == 'mc'" ng-include="'search/mc.html'"></div>
+                    <div ng-if="exercise.type == 'pd'" ng-include="'search/pd.html'"></div>
+                    <div ng-if="exercise.type == 'tf'" ng-include="'search/tf.html'"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>

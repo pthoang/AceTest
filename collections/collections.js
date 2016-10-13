@@ -4,7 +4,7 @@ angular.module('myApp.collections', ['ngRoute'])
                                              subjectService, collectionService, requestService,alertify, focus) {
 
         $scope.subject = subjectService.getSubject();
-        $scope.deletedCollections = {};
+        $scope.confirmDelete = {};
         $scope.admin = $cookies.getObject('admin');
 
         var initCollections = function (subject) {
@@ -45,11 +45,21 @@ angular.module('myApp.collections', ['ngRoute'])
         };
 
         $scope.deleteCollection = function (coll, index) {
-            $scope.deletedCollections[$scope.subject.collections[index].id] = true;
+            if($scope.confirmDelete[$scope.subject.collections[index].id]) {
+                requestService.httpDelete('/collections/' + $scope.subject.collections[index].id)
+                    .then(function (response) {
+                        refresh();
+                        alertify.success('Oppgavesett slettet')
+                    }, function (response) {
+                         alertify.success('En feil oppstod under slettingen')
+                    })
+            } else {
+                $scope.confirmDelete[$scope.subject.collections[index].id] = true;
+            }
         };
 
         $scope.undoDeleteCollection = function (collectionId) {
-            delete $scope.deletedCollections[collectionId];
+            delete $scope.confirmDelete[collectionId];
         };
 
         $scope.saveSubject = function () {
@@ -57,43 +67,21 @@ angular.module('myApp.collections', ['ngRoute'])
                     name: $scope.subject.name,
                     description: $scope.subject.description,
                     code: $scope.subject.code,
+                    color: $scope.subject.color ? $scope.subject.color: undefined,
                     order: orderUpdate ? $scope.collections.map(function (collection) {
-                        if(!$scope.deletedCollections[collection.id]) {
-                            return collection.id
-                        }
+                            return collection.id;
                     }) : undefined
             };
-            var requests = [];
-            angular.forEach($scope.deletedCollections, function (value, collectionId) {
-                if(value) {
-                    requests.push(requestService.httpDelete('/collections/' + collectionId))
-                }
-            });
-            console.log($scope.collections);
-            requests.push(requestService.httpPut('/subjects/' + $scope.subject.id, data));
-            $q.all(requests)
+            requestService.httpPut('/subjects/' + $scope.subject.id, data)
                 .then(function (response) {
                     refresh();
-                    alertify.success("Suksess! Endringene dine ble lagret.");
-                },function(response){
+                    alertify.success("Alle endringer lagret");
+                }, function (response) {
                     console.log(response);
-                    // $scope.errorMsg = response.errors[0].dataPath.split('.');
-                    // if($scope.errorMsg.length == 3){
-                    //     if($scope.errorMsg[2].indexOf('name') > -1) {
-                    //         alertify.error("Fagnavn mangler! Fyll ut og prøv igjen...");
-                    //     }
-                    //     else{
-                    //         alertify.error("Oops, noe gikk galt! Prøv igjen...");
-                    //
-                    //     }
-                    // }
-                    // else{
-                    //     alertify.error("Oops, noe gikk galt! Prøv igjen...")
-                    //
-                    // }
-
-                })
+                    alertify.error('En feil oppstod under lagringen')
+                });
         };
+
 
         $scope.publishSubject = function (value) {
             var data = {
@@ -118,6 +106,7 @@ angular.module('myApp.collections', ['ngRoute'])
             containment: "#collectionsArea",
             orderChanged: function (event) {
                 orderUpdate = true;
+                $scope.saveSubject();
             }
         };
 
@@ -126,6 +115,9 @@ angular.module('myApp.collections', ['ngRoute'])
         };
 
         $scope.unFocus = function () {
+            if($scope.editSubjectName || $scope.editSubjectDescription) {
+                $scope.saveSubject();
+            }
             $scope.editSubjectName = false;
             $scope.editSubjectDescription = false;
         };
@@ -243,7 +235,12 @@ angular.module('myApp.collections', ['ngRoute'])
                             $scope.exercise.content.wrongs.push({answer: alternative.answer})
                         }
                     });
-
+                    if($scope.exercise.content.corrects.length == 0) {
+                        $scope.exercise.content.corrects.push({answer: ''})
+                    }
+                    if($scope.exercise.content.wrongs.length == 0) {
+                        $scope.exercise.content.wrongs.push({answer: ''})
+                    }
 
                 }
 
@@ -270,7 +267,7 @@ angular.module('myApp.collections', ['ngRoute'])
                 var wrongCopy = angular.copy(wrong);
                 wrongCopy.correct = false;
                 $scope.mcAlternatives.push(wrongCopy);
-            })
+            });
         };
 
         $scope.focusNextAlternative = function (event, last, index) {

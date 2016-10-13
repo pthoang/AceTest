@@ -47,7 +47,7 @@ angular.module('myApp.edit', ['ngRoute'])
         if(subjectService.getSubject()) {
             $scope.subjectName = subjectService.getSubject().name;
         }
-        window.localStorage.setItem('refreshed', false);
+        //window.localStorage.setItem('refreshed', false);
 
         $scope.collection = $routeParams.collectionId == 'new' ? undefined : collectionService.getCollection();
 
@@ -76,35 +76,33 @@ angular.module('myApp.edit', ['ngRoute'])
 
 
 
-
-
         //handles refresh
-        window.onbeforeunload = function (evt) {
-            var message = 'Er du sikker på at du vil forlate?';
-            if (typeof evt == 'undefined') {
-                evt = window.event;
-            }
-            if (evt) {
-                evt.returnValue = message;
-            }
-            return message;
-        };
-        window.onunload = function () {
-            window.localStorage.setItem('refreshed', true);
-        };
-
-        $scope.$on("$routeChangeStart", function (event, next, current) {
-            if (!$scope.clickedSave) {
-                if (!(next.$$route.originalPath.indexOf('/login') > -1)) {
-                    if(window.localStorage.getItem('refreshed') == 'false') {
-                        if (!confirm("Alle endringer vil bli forkastet. Er du sikker på at du vil forlate denne siden? ")) {
-                            event.preventDefault();
-                        }
-                    }
-                }
-
-            }
-        });
+        // window.onbeforeunload = function (evt) {
+        //     var message = 'Er du sikker på at du vil forlate?';
+        //     if (typeof evt == 'undefined') {
+        //         evt = window.event;
+        //     }
+        //     if (evt) {
+        //         evt.returnValue = message;
+        //     }
+        //     return message;
+        // };
+        // window.onunload = function () {
+        //     window.localStorage.setItem('refreshed', true);
+        // };
+        //
+        // $scope.$on("$routeChangeStart", function (event, next, current) {
+        //     if (!$scope.clickedSave) {
+        //         if (!(next.$$route.originalPath.indexOf('/login') > -1)) {
+        //             if(window.localStorage.getItem('refreshed') == 'false') {
+        //                 if (!confirm("Alle endringer vil bli forkastet. Er du sikker på at du vil forlate denne siden? ")) {
+        //                     event.preventDefault();
+        //                 }
+        //             }
+        //         }
+        //
+        //     }
+        // });
 
         $scope.onChangeHandler = function (exercise) {
             return function (e, fileObjects) {
@@ -138,10 +136,6 @@ angular.module('myApp.edit', ['ngRoute'])
                 wrongCopy.correct = false;
                 $scope.mcAlternatives.push(wrongCopy);
             });
-            if($scope.mcAlternatives.length == 0) {
-                $scope.mcAlternatives.push({answer: '', correct: true});
-                $scope.mcAlternatives.push({answer: '', correct: false})
-            }
         };
 
         $scope.focusNextAlternative = function (event, last, index) {
@@ -184,10 +178,10 @@ angular.module('myApp.edit', ['ngRoute'])
 
         var orderUpdate = false;
 
-        $scope.addExercise = function () {
+        $scope.addExercise = function (type) {
             orderUpdate = true;
             var exercise = {
-                "type": $scope.defaultType,
+                "type": type,
                 "content": {question: {}}
             };
             if(exercise.type == 'mc') {
@@ -204,140 +198,154 @@ angular.module('myApp.edit', ['ngRoute'])
                 window.scrollTo(0, document.body.scrollHeight);
             }, 0);
             $scope.choseActiveExercise($scope.collection.exercises.length - 1);
-            focus('activeQuestion')
+            focus('activeQuestion');
+            $scope.defaultType = type
         };
 
-        var deleteList = [];
+        $scope.confirmDelete = {};
 
         $scope.deleteExercise = function (index) {
-            if($scope.exercises[index].id){
-                deleteList.push($scope.exercises[index].id);
+            if($scope.confirmDelete[index]) {
+                if($scope.exercises[index].id){
+                    requestService.httpDelete('/exercises/' + $scope.exercises[index].id)
+                        .then(function (response) {
+                            $scope.exercises.splice(index, 1);
+                            $scope.activeExercise = undefined;
+                            alertify.success('Oppgaven er slettet')
+                        }, function (response) {
+                            console.log(response);
+                            alertify.error('En feil oppstod under sletting av oppgaven')
+                        })
+                } else {
+                    $scope.exercises.splice(index, 1);
+                    $scope.activeExercise = undefined;
+                    alertify.success('Oppgaven er slettet')
+                }
+                delete $scope.confirmDelete[index];
+            } else {
+                $scope.confirmDelete[index] = true;
             }
-            if (index > -1) {
-                $scope.exercises.splice(index, 1);
-            }
-            $scope.activeExercise = undefined
         };
 
         var errorList = {};
-        $scope.saveCollection = function (nextAction) {
-            errorList = {};
-            $scope.saveClicked = true;
-            $scope.clickedSave = true;
-            $scope.choseActiveExercise(undefined);
-            var validateExercises = function (exercise) {
-                exercise.collaborators = exercise.collaborators || [$cookies.getObject('username')];
-                if (exercise.collaborators.indexOf($cookies.getObject('username')) == -1) {
-                    exercise.collaborators.push($cookies.getObject('username'))
-                };
 
-                if (exercise.type == "mc") {
-                    //exercise.wrongs = exercise.wrongs.filter(Boolean);
-                    for(var property in exercise.content) {
-                        if(!mc[property]) {
-                            delete exercise.content[property]
-                        }
-                    }
-                    validateExercise(mcSchema, exercise.content);
-                } else if (exercise.type == "pd") {
-                    if (!exercise.content.tags) {
-                        exercise.content.tags = [];
-                    }
-                    for(var property in exercise.content) {
-                        if(!pd[property]) {
-                            delete exercise.content[property]
-                        }
-                    }
-                    exercise.content.correct.answer = exercise.content.correct.answer.toString();
-                    validateExercise(pdSchema, exercise.content)
-                } else if (exercise.type == "tf") {
-                    for(var property in exercise.content) {
-                        if(!tf[property]) {
-                            delete exercise.content[property]
-                        }
-                    }
-                    validateExercise(tfSchema, exercise.content)
-                };
-
-            };
-            var initHttpRequests = [];
-            if ($scope.collection.id == undefined) {
-                var data = {
-                    name: $scope.collection.name,
-                    inOrder: $scope.collection.inOrder? true:false,
-                    public: true
-                };
-                initHttpRequests.push(requestService.httpPost('/subjects/'+$routeParams.subjectId + "/collections",
-                    data, function (response) {
-                    $scope.collection.id = response.insertedId;
-                }));
-            };
-
-            var sendExercises = [];
-            angular.forEach($scope.exercises, function (exercise) {
-                validateExercises(exercise);
-                if (exercise.content.question.image && !exercise.content.question.image.url) {
-                    var data = {
-                        filetype: exercise.content.question.image[0].filetype,
-                        base64: exercise.content.question.image[0].base64,
-                        subjectId: subjectService.getSubject().id
-                    };
-                    initHttpRequests.push(requestService.putImage(data, function (response) {
-                        exercise.content.question.image = {
-                            url: response.secure_url
-                        }
-                    }))
-                }
-            });
-            $q.all(initHttpRequests).then(function () {
-                angular.forEach($scope.exercises, function (exercise, index) {
-                    if(!exercise.id) {
-                        sendExercises.push(requestService.httpPost('/collections/' + $scope.collection.id + '/exercises'
-                            , exercise, function (response) {
-                                exercise.id = parseInt(response.insertedId)
-                            },errorList, index))
-                    } else {
-                        sendExercises.push(requestService.httpPut('/exercises/' + exercise.id, exercise, errorList, index))
-                    }
-                });
-                angular.forEach(deleteList, function (exerciseId) {
-                    sendExercises.push(requestService.httpDelete('/exercises/' + exerciseId))
-                });
-                $q.all(sendExercises).then(function (response) {
-                    var data = {
-                        name: $scope.collection.name,
-                        inOrder: $scope.collection.inOrder,
-                        order: orderUpdate? $scope.collection.exercises.map(function (exercise) {
-                            return exercise.id
-                        }) : undefined
-                    };
-                    requestService.httpPut('/collections/'+ $scope.collection.id, data).then(function (response) {
-                        if(nextAction == 'goToSubject') {
-                            $location.path('/subjects/' + $routeParams.subjectId);
-                        }
-                        else if(nextAction == 'goToAdd') {
-                            if($routeParams.collectionId == 'new') {
-                                $location.replace();
-                            }
-                            $location.path('/subjects/' + $routeParams.subjectId + '/collections/' + $scope.collection.id + '/add')
-                        }
-                    }, function (response) {
-                        if(response.status==400) {
-                            alertify.error('En feil oppstod. Kontroller navnet på settet')
-                        }
-                        $scope.saveClicked = false;
-                    })
-                }, function (response) {
-                    console.log(response);
-                    alertify.error('En eller flere feil oppstod. Kontroller markerte oppgaver');
-                    $scope.saveClicked = false;
-                });
-            }, function (response) {
-                console.log(response);
-                $scope.saveClicked = false;
-            });
-
-        };
+        // $scope.saveCollection = function (nextAction) {
+        //     errorList = {};
+        //     $scope.saveClicked = true;
+        //     $scope.clickedSave = true;
+        //     $scope.choseActiveExercise(undefined);
+        //     var validateExercises = function (exercise) {
+        //         exercise.collaborators = exercise.collaborators || [$cookies.getObject('username')];
+        //         if (exercise.collaborators.indexOf($cookies.getObject('username')) == -1) {
+        //             exercise.collaborators.push($cookies.getObject('username'))
+        //         };
+        //
+        //         if (exercise.type == "mc") {
+        //             //exercise.wrongs = exercise.wrongs.filter(Boolean);
+        //             for(var property in exercise.content) {
+        //                 if(!mc[property]) {
+        //                     delete exercise.content[property]
+        //                 }
+        //             }
+        //             validateExercise(mcSchema, exercise.content);
+        //         } else if (exercise.type == "pd") {
+        //             if (!exercise.content.tags) {
+        //                 exercise.content.tags = [];
+        //             }
+        //             for(var property in exercise.content) {
+        //                 if(!pd[property]) {
+        //                     delete exercise.content[property]
+        //                 }
+        //             }
+        //             validateExercise(pdSchema, exercise.content)
+        //         } else if (exercise.type == "tf") {
+        //             for(var property in exercise.content) {
+        //                 if(!tf[property]) {
+        //                     delete exercise.content[property]
+        //                 }
+        //             }
+        //             validateExercise(tfSchema, exercise.content)
+        //         };
+        //
+        //     };
+        //     var initHttpRequests = [];
+        //     if ($scope.collection.id == undefined) {
+        //         var data = {
+        //             name: $scope.collection.name,
+        //             inOrder: $scope.collection.inOrder? true:false,
+        //             public: true
+        //         };
+        //         initHttpRequests.push(requestService.httpPost('/subjects/'+$routeParams.subjectId + "/collections",
+        //             data, function (response) {
+        //             $scope.collection.id = response.insertedId;
+        //         }));
+        //     };
+        //
+        //     var sendExercises = [];
+        //     angular.forEach($scope.exercises, function (exercise) {
+        //         validateExercises(exercise);
+        //         if (exercise.content.question.image && !exercise.content.question.image.url) {
+        //             var data = {
+        //                 filetype: exercise.content.question.image[0].filetype,
+        //                 base64: exercise.content.question.image[0].base64,
+        //                 subjectId: subjectService.getSubject().id
+        //             };
+        //             initHttpRequests.push(requestService.putImage(data, function (response) {
+        //                 exercise.content.question.image = {
+        //                     url: response.secure_url
+        //                 }
+        //             }))
+        //         }
+        //     });
+        //     $q.all(initHttpRequests).then(function () {
+        //         angular.forEach($scope.exercises, function (exercise, index) {
+        //             if(!exercise.id) {
+        //                 sendExercises.push(requestService.httpPost('/collections/' + $scope.collection.id + '/exercises'
+        //                     , exercise, function (response) {
+        //                         exercise.id = parseInt(response.insertedId)
+        //                     },errorList, index))
+        //             } else {
+        //                 sendExercises.push(requestService.httpPut('/exercises/' + exercise.id, exercise, errorList, index))
+        //             }
+        //         });
+        //         angular.forEach(deleteList, function (exerciseId) {
+        //             sendExercises.push(requestService.httpDelete('/exercises/' + exerciseId))
+        //         });
+        //         $q.all(sendExercises).then(function (response) {
+        //             var data = {
+        //                 name: $scope.collection.name,
+        //                 inOrder: $scope.collection.inOrder,
+        //                 order: orderUpdate? $scope.collection.exercises.map(function (exercise) {
+        //                     return exercise.id
+        //                 }) : undefined
+        //             };
+        //             requestService.httpPut('/collections/'+ $scope.collection.id, data).then(function (response) {
+        //                 if(nextAction == 'goToSubject') {
+        //                     $location.path('/subjects/' + $routeParams.subjectId);
+        //                 }
+        //                 else if(nextAction == 'goToAdd') {
+        //                     if($routeParams.collectionId == 'new') {
+        //                         $location.replace();
+        //                     }
+        //                     $location.path('/subjects/' + $routeParams.subjectId + '/collections/' + $scope.collection.id + '/add')
+        //                 }
+        //             }, function (response) {
+        //                 if(response.status==400) {
+        //                     alertify.error('En feil oppstod. Kontroller navnet på settet')
+        //                 }
+        //                 $scope.saveClicked = false;
+        //             })
+        //         }, function (response) {
+        //             console.log(response);
+        //             alertify.error('En eller flere feil oppstod. Kontroller markerte oppgaver');
+        //             $scope.saveClicked = false;
+        //         });
+        //     }, function (response) {
+        //         console.log(response);
+        //         $scope.saveClicked = false;
+        //     });
+        //
+        // };
 
         $scope.isInErrorList = function (index) {
             return errorList[index];
@@ -357,29 +365,95 @@ angular.module('myApp.edit', ['ngRoute'])
             });
         };
 
+        var updateCollection = function () {
+            var updateData = {
+                name: $scope.collection.name,
+                inOrder: $scope.collection.inOrder,
+                order: orderUpdate? $scope.collection.exercises.map(function (exercise) {
+                    return exercise.id
+                }) : undefined
+            };
+            requestService.httpPut('/collections/' + $scope.collection.id, updateData)
+                .then(function (response) {
+                    alertify.success('Endringer lagret');
+                    console.log(response)
+                }, function (response) {
+                    console.log(response);
+                    alertify.error('En feil oppstod ved lagring av endringene')
+                });
+        };
         $scope.choseActiveExercise = function (index) {
             if(index != $scope.activeExercise) {
                 $scope.extraProperty = {};
                 if($scope.activeExercise != undefined) {
-                    if($scope.exercises[$scope.activeExercise].type == 'mc') {
+                    var exercise = $scope.exercises[$scope.activeExercise];
+                    var activeIndex = $scope.activeExercise;
+                    if(exercise.type == 'mc') {
                         filterAlternativeArray($scope.mcAlternatives);
-                        $scope.exercises[$scope.activeExercise].content.corrects = [];
-                        $scope.exercises[$scope.activeExercise].content.wrongs = [];
+                        exercise.content.corrects = [];
+                        exercise.content.wrongs = [];
                         angular.forEach($scope.mcAlternatives, function (alternative) {
                             if(alternative.correct) {
-                                $scope.exercises[$scope.activeExercise].content.corrects.push({answer: alternative.answer});
+                                exercise.content.corrects.push({answer: alternative.answer});
                             } else {
-                                $scope.exercises[$scope.activeExercise].content.wrongs.push({answer: alternative.answer})
+                                exercise.content.wrongs.push({answer: alternative.answer})
                             }
                         });
-
-
+                        if(exercise.content.corrects.length == 0) {
+                            exercise.content.corrects.push({answer: ''})
+                        }
+                        if($scope.exercises[$scope.activeExercise].content.wrongs.length == 0) {
+                            exercise.content.wrongs.push({answer: ''})
+                        }
+                    }
+                    if(exercise.id) {
+                        requestService.httpPut('/exercises/' + exercise.id, exercise)
+                            .then(function (response) {
+                                console.log(response);
+                                alertify.success('Oppgaven lagret');
+                                delete errorList[activeIndex]
+                            }, function (response) {
+                                console.log(response)
+                                alertify.error('En feil oppstod ved lagring av oppgaven');
+                                errorList[activeIndex] = true
+                            })
+                    } else {
+                        requestService.httpPost('/collections/' + $scope.collection.id + '/exercises', exercise)
+                            .then(function (response) {
+                                exercise.id = response.insertedId;
+                                alertify.success('Oppgaven lagret');
+                                delete errorList[activeIndex]
+                            }, function (response) {
+                                console.log(response)
+                                alertify.error('En feil oppstod ved lagring av oppgaven')
+                                errorList[activeIndex] = true
+                            })
                     }
 
                 }
             }
             $scope.activeExercise = index;
-            $scope.editCollectionName.value = false;
+            if($scope.editCollectionName.value) {
+                if($scope.collection.id == undefined) {
+                    var data = {
+                                    name: $scope.collection.name,
+                                    inOrder: $scope.collection.inOrder? true:false,
+                                    public: true
+                                };
+                    requestService.httpPost('/subjects/'+$routeParams.subjectId + "/collections", data)
+                        .then(function (response) {
+                            $scope.collection.id = response.insertedId;
+                            alertify.success('Navn lagret');
+                            console.log(response)
+                        }, function (response) {
+                            console.log(response)
+                            alertify.error('En feil oppstod ved oppretting av oppgavesettet')
+                        })
+                } else {
+                    updateCollection()
+                }
+                $scope.editCollectionName.value = false;
+            }
         };
 
         $scope.tabNextExercise = function () {
@@ -387,7 +461,7 @@ angular.module('myApp.edit', ['ngRoute'])
                 $scope.choseActiveExercise($scope.activeExercise+1);
                 focus('activeQuestion')
             } else {
-                $scope.addExercise()
+                $scope.addExercise($scope.defaultType)
             }
         };
 
@@ -419,6 +493,9 @@ angular.module('myApp.edit', ['ngRoute'])
             }
         };
 
+        $scope.goToAddExercises = function () {
+            $location.path('/subjects/' + $routeParams.subjectId + '/collections/' + $scope.collection.id + '/add')
+        };
 
         $scope.dragControlListeners = {
             accept: function (sourceItemHandleScope, destSortableScope) {
@@ -428,12 +505,8 @@ angular.module('myApp.edit', ['ngRoute'])
             allowDuplicate: true,
             orderChanged: function (event) {
                 orderUpdate = true;
-                if (event.source.index == $scope.activeExercise) {
-                    $scope.extraProperty[event.dest.index] = $scope.extraProperty[event.source.index];
-                    $scope.activeExercise = event.dest.index;
-                } else {
-                    $scope.activeExercise = undefined
-                }
+                errorList = {};
+                updateCollection()
             },
             dragMove: function (itemPosition, containment, eventObj) {
                 if (eventObj) {

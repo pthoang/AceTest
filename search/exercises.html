@@ -1,27 +1,27 @@
 <div ng-repeat="result in getResults()">
-    <div ng-if="!addedExercises[result.exercise.id]" class="row" ng-click="openExerciseModal(result.exercise)"
+    <div ng-if="!addedExercises[result.id]" class="row search-result" ng-click="openExerciseModal(result)"
          style="padding-bottom: 15px;border-bottom: 1px solid #ccc; cursor: pointer;">
         <div class="col-xs-11">
             <div class="container-fluid">
-                <h3>{{result.exercise.content.question.text}}</h3>
+                <h3>{{result.content.question.text}}</h3>
                 <p>{{result.subject.name}}({{result.subject.code}})</p>
             </div>
         </div>
         <div class="col-xs-1">
-            <span class="glyphicon glyphicon-plus" ng-click="$event.stopPropagation(); addExercise(result.exercise)"
+            <span class="glyphicon glyphicon-plus" ng-click="$event.stopPropagation(); addExercise(result)"
                   style="color: royalblue; font-size: 30px; margin-top: 100%"></span>
         </div>
     </div>
-    <div ng-if="addedExercises[result.exercise.id]" class="row"
+    <div ng-if="addedExercises[result.id]" class="row"
          style="padding-bottom: 15px;border-bottom: 1px solid #ccc; background-color: lightgrey">
         <div class="col-xs-11">
             <div class="container-fluid">
-                <h3>{{result.exercise.content.question.text}}</h3>
+                <h3>{{result.content.question.text}}</h3>
                 <p>{{result.subject.name}}({{result.subject.code}})</p>
             </div>
         </div>
         <div class="col-xs-1">
-            <span class="glyphicon glyphicon-ok" ng-click="$event.stopPropagation(); removeExercise(result.exercise.id)"
+            <span class="glyphicon glyphicon-ok" ng-click="$event.stopPropagation(); removeExercise(result.id)"
                   style="color: royalblue; font-size: 30px; margin-top: 100%; cursor: pointer"></span>
         </div>
     </div>

@@ -2,11 +2,12 @@
     <div class="container-fluid div-card" style="width: 960px; margin-bottom: 20px">
         <div class="row">
             <div class="col-xs-3" style="background-color: cornflowerblue; height: 150px; cursor: pointer" ng-click="goBack()">
-                <h4 style="color: white"><i>Du legger til i ..... . Trykk her for å gå tilbake når
+                <h4 style="color: white"><i>Du legger til i "{{addDestination}}" . Trykk her for å gå tilbake når
                 når du er ferdig!</i></h4>
             </div>
             <div class="col-xs-9">
-                <h3>Søk etter oppgaver og oppgavesett. Bruk hva enn du vil!</h3>
+                <h3 ng-if="searchPath=='collections'">Søk etter oppgavesett. Bruk hva enn du vil!</h3>
+                <h3 ng-if="searchPath=='exercises'">Søk etter oppgaver. Bruk hva enn du vil!</h3>
                 <br>
                 <div class="form-inline">
                     <input class="form-control" style="width: 500px;" ng-model="searchTerms"
@@ -23,7 +24,7 @@
                 <h4 style="padding-bottom: 10px">Søker i:</h4>
                 <div class="row">
                     <div class="col-xs-6">
-                        <h4 ng-if="searchPath == 'collections'">Sett</h4>
+                        <h4 ng-if="searchPath == 'collections'">Oppgavesett</h4>
                         <h4 ng-if="searchPath == 'exercises'">Oppgaver</h4>
                     </div>
                     <div class="col-xs-6" align="right">

@@ -9,17 +9,21 @@ angular.module('myApp.addexercises', ['ngRoute'])
         $scope.searchPath='exercises';
         $scope.addedExercises = {};
         $scope.currentPage = 1;
-
+        $scope.addDestination = collectionService.getCollection().name;
+        $scope.searchTerms = subjectService.getSubject().name;
         $scope.searchItems = function () {
             $http({
-                url: apiUrl + "/search/exercises?search=" + $scope.searchTerms.replace(/[\s]/g,'_'),
+                url: apiUrl + "/search?q=" + $scope.searchTerms.replace(/[\s]/g,'_') + "&r=exercises",
                 method: 'GET'
 
             }).success(function (response) {
+                console.log(response)
                 $scope.currentPage = 1;
                 $scope.resultList = response;
             })
         };
+
+        $scope.searchItems();
 
         $scope.goBack = function () {
             $location.path('/subjects/' + $routeParams.subjectId + '/collections/' + $routeParams.collectionId)
@@ -42,8 +46,7 @@ angular.module('myApp.addexercises', ['ngRoute'])
             });
         };
 
-        $scope.removeExercise = function (event, exerciseId) {
-            event.stopPropagation();
+        $scope.removeExercise = function (exerciseId) {
             requestService.httpDelete('/exercises/' + $scope.addedExercises[exerciseId]).then(function (response) {
                 for(var i=collectionService.getCollection().exercises.length-1; i >= 0 ; i--) {
                     if(collectionService.getCollection().exercises[i].id == $scope.addedExercises[exerciseId]) {

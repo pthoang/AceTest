@@ -1,0 +1,35 @@
+<div class="container-fluid" ng-click="openSubjectModal(result)">
+    <p style="color: lightgrey; margin-top: 10px">Pakke</p>
+    <span style="font-size: 25px; font-weight: bold;">{{result.name}}</span>
+    <span style="font-size: 15px; font-weight: bold">({{result.code}})</span>
+    <p>{{result.description}}</p>
+</div>
+
+<script type="text/ng-template" id="subjectModal.html">
+    <div class="modal-body" align="left">
+        <span style="font-size: 25px; font-weight: bold">{{subject.name}}</span>
+        <span style="font-size: 15px; font-weight: bold">({{subject.code}})</span>
+        <div class="container-fluid" ng-repeat="collection in subject.collections track by $index">
+            <label class="btn btn-default" style="white-space: normal; width: 100%; text-align: left;"
+            ng-click="openCollection[$index] = !openCollection[$index]">
+                <span style="font-size: 20px; font-weight: bold">{{collection.name}}</span>
+                <span style="font-size: 15px; font-weight: bold">
+                    ({{collection.exercises.length}}
+                    <img src="img/definition-icon.png" style="width: 15px">)
+                </span>
+            </label>
+            <div uib-collapse="!openCollection[$index]">
+                <div class="well well-sm" align="left" style="margin-bottom: 1px; max-height: 250px; overflow-y: scroll">
+                    <div ng-repeat="exercise in collection.exercises track by $index" align="left"
+                         ng-style="$last? {}:{'border-bottom': '1px solid #cccccc'}">
+                        <div class="container-fluid">
+                            <div ng-if="exercise.type == 'mc'" ng-include="'search/mc.html'"></div>
+                            <div ng-if="exercise.type == 'pd'" ng-include="'search/pd.html'"></div>
+                            <div ng-if="exercise.type == 'tf'" ng-include="'search/tf.html'"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>

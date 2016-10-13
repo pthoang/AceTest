@@ -1,0 +1,42 @@
+<div class="container-fluid" align="center">
+    <div class="container-fluid div-card" style="width: 960px; margin-bottom: 20px">
+        <h3>Utforsk innholdet vårt!</h3>
+        <div class="form-inline" style="margin-bottom: 20px">
+            <input class="form-control" ng-keypress="$event.keyCode==13 && searchItems()" style="width: 500px" ng-model="searchTerms">
+            <button class="btn btn-primary" style="width: 100px">Søk</button>
+        </div>
+    </div>
+
+    <div ng-if="resultList" style="width: 960px" align="left">
+        <div class="col-xs-2 div-card">
+            <h4 style="padding-bottom: 10px">Søker i:</h4>
+            <div class="row">
+                <div class="col-xs-6">
+                    <h4>Alle</h4>
+                </div>
+                <div class="col-xs-6" align="right">
+                    <h4>{{resultList.length}}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-1"></div>
+        <div class="col-xs-9 div-card">
+            <div ng-repeat="result in getResults(currentPage)" class="row search-result" style="border-bottom: 1px solid #cccccc; cursor: pointer">
+                <div ng-if="result.resource=='subjects'" ng-include="'search/searchTemplates/subjects.html'"></div>
+                <div ng-if="result.resource=='collections'" ng-include="'search/searchTemplates/collections.html'"></div>
+                <div ng-if="result.resource=='exercises'" ng-include="'search/searchTemplates/exercises.html'"></div>
+            </div>
+            <div ng-if="resultList.length == 0" class="container-fluid" align="center">
+                <p><i>Ingen resultater...</i></p>
+            </div>
+        </div>
+        <div ng-show="resultList" class="container-fluid" style="width: 960px">
+            <div class="col-xs-3">
+            </div>
+            <div class="col-xs-9" align="center">
+                <ul class="pagination-sm" uib-pagination total-items="resultList.length" ng-change="scrollTopResult()"
+                    ng-model="currentPage" max-size="5" next-text="Neste" previous-text="Forrige"></ul>
+            </div>
+        </div>
+    </div>
+</div>

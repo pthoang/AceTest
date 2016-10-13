@@ -1,4 +1,5 @@
 <div>
+    <p ng-style="addExercises[exercise.id]? {'color': 'black'}: {'color': 'lightgrey'}">Multiple Choice</p>
     <h4>{{exercise.content.question.text}}</h4>
     <div ng-repeat="correct in exercise.content.corrects">
         <span class="glyphicon glyphicon-ok" style="padding-right: 3px"></span><span>{{correct.answer}}</span>

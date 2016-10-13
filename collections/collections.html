@@ -1,4 +1,4 @@
-<div class="container-fluid" align="center" style="width: 100%" ng-click="unFocus()">
+<div class="container-fluid" align="center" style="width: 100%; height: 100vh" ng-click="unFocus()">
     <div class="div-card" ng-mouseenter="showExtendButton = true" ng-mouseleave="showExtendButton = false" style="width:960px;margin-bottom: 20px; position: relative" align="left">
         <div class="header-collections">
             <div ng-click="$event.stopPropagation(); setEditTrue('subjectName')" class="container-fluid" style="width: 95%">
@@ -17,7 +17,7 @@
         </div>
         <div style="margin-top: 20px">
             <div class="container-fluid" style="width:95%; color: cornflowerblue; font-weight: bold; margin-bottom: 20px">
-                <span style="cursor: pointer;" ng-click="openReportModal()"></b>Oppdateringer({{reportInfo.length}})</span>
+                <span style="cursor: pointer;"></b>Oppdateringer(0)</span>
                 <span>/</span>
                 <span style="cursor: pointer;" ng-click="openReportModal()">Tilbakemeldinger ({{reportInfo.length}})</span>
             </div>
@@ -37,7 +37,6 @@
         <div class="container-fluid" style="height: 10px"></div>
 
         <form style="position:absolute;top:20px;right:10px;">
-            <label class="btn btn-collections" ng-click="saveSubject()">Lagre</label>
             <label class="btn btn-collections" ng-click="previewSubject()">Preview</label>
             <div ng-if="admin">
                 <label ng-if="subject.published!='yes'" class="btn btn-collections" ng-click="publishSubject('yes')">Publiser</label>
@@ -58,11 +57,11 @@
             </div>
             <form style="position: relative; top: -55px; left: 585px; width: 400px;">
                 <label class="btn btn-collections" ng-click="setTargetCollection('new')" style="width:45%;">
-                    <span class="glyphicon glyphicon-plus"></span>
+                    <span class="glyphicon glyphicon-plus-sign"></span>
                     Nytt oppgavesett
                 </label>
                 <label class="btn btn-collections" ng-click="goTo('subjects/'+subject.id+'/add')" style="width:45%;">
-                    <span class="glyphicon glyphicon-arrow-right"></span>
+                    <span class="glyphicon glyphicon-circle-arrow-down"></span>
                     Hent oppgavesett
                 </label>
             </form>
@@ -75,24 +74,27 @@
         <div id="collectionsArea">
             <div as-sortable="dragControlListeners" ng-model="collections">
                 <div as-sortable-item ng-repeat="collection in collections track by $index" ng-model="collection"
-                     ng-mouseenter="focused[$index] = true" ng-mouseleave="focused[$index] = false">
+                     ng-mouseenter="focused[$index] = true" ng-mouseleave="focused[$index] = false; confirmDelete[collection.id] = false">
                     <div as-sortable-item-handle class="container-fluid">
-                        <div ng-click="setTargetCollection($index)" class="col-xs-8" ng-show="!deletedCollections[collection.id]" style="cursor: pointer">
+                        <div ng-click="setTargetCollection($index)" class="col-xs-8" ng-show="!confirmDelete[collection.id]" style="cursor: pointer">
                             <h4>
                                 {{collection.name}}
                             </h4>
                         </div>
-                        <div ng-click="setTargetCollection($index)" class="col-xs-2" align="right" ng-show="!deletedCollections[collection.id]" style="cursor: pointer">
+                        <div ng-click="setTargetCollection($index)" class="col-xs-2" align="right" ng-show="!confirmDelete[collection.id]" style="cursor: pointer">
                             <h4>{{collection.exercises.length}} <img src="img/definition-icon.png" style="width: 20px"></h4>
                         </div>
-                        <div class="col-xs-9" ng-show="deletedCollections[collection.id]">
+                        <div class="col-xs-9" ng-show="confirmDelete[collection.id]">
                             <h4 ng-click="undoDeleteCollection(collection.id)" style="cursor: pointer">
                                 <del>{{collection.name}}</del>
                             </h4>
                         </div>
                         <div class="col-xs-1"></div>
+                        <div ng-show="confirmDelete[collection.id]" class="col-xs-1">
+                            <p style="font-size: 10px">Klikk for å bekrefte</p>
+                        </div>
                         <div class="col-xs-1">
-                            <span ng-show="focused[$index] && !deletedCollections[collection.id]" ng-click="deleteCollection(collection,$index)" style="margin-top:10px;cursor: pointer" class="glyphicon glyphicon-trash"></span>
+                            <span ng-show="focused[$index]" ng-click="deleteCollection(collection,$index)" style="margin-top:10px;cursor: pointer" class="glyphicon glyphicon-trash"></span>
                         </div>
                     </div>
                     <div ng-show="$last" style="height: 20px"></div>
