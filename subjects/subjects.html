@@ -1,34 +1,52 @@
 
-<div class="container-fluid" align="center">
-    <button class="btn add-subject" ng-click="openAddSubjectModal()" >
-        <p style="margin-top: 5px"><b>+ Ny pakke</b></p>
-    </button>
+
+<div class="container-fluid div-card" style="width: 960px; color: cornflowerblue; margin-bottom: 20px" align="center">
+    <h1 style="margin-bottom: 20px">Velkommen {{userName}}!</h1>
+    <h4>Hva vil du gjøre?</h4>
+    <div class="container-fluid" align="center" style="margin-bottom: 10px">
+        <button class="btn subject-options" ng-click="openAddSubjectModal()" >
+            <p><b>+ Nytt fag</b></p>
+        </button>
+        <a href="#/search">
+            <button class="btn subject-options">
+                <p><b>Utforsk</b></p>
+            </button>
+        </a>
+    </div>
 </div>
 
-<div class="container-fluid" id="loading-bar-container" ng-repeat="item in subjects track by $index" align="center">
-    <div ng-mouseenter="mouseOver[$index] = true" ng-mouseleave="mouseOver[$index] = false; delete[$index]=false"
-         class="btn-subjects" ng-click="setTargetSubject(item)" align="left">
-        <div class="container-fluid" style="width: 90%">
-            <h1 style="margin-top: 25px"><b>{{ item.name }}</b></h1>
-            <p style="font-size: 17px; margin-top: -2px">{{item.code}}</p>
-        </div>
-        <div ng-show="mouseOver[$index]" class="container-fluid">
-            <span ng-show="!delete[$index]" class="glyphicon glyphicon-trash"
-                  style="font-size: 15px; position: relative; top: -30px;left: 800px; cursor: pointer"
-                  ng-click="$event.stopPropagation(); delete[$index]=true"></span>
-            <div ng-show="delete[$index]">
-                <span style="position: relative; top: -30px;left: 730px; font-size: 12px">Er du sikker?</span>
-                <span ng-click="$event.stopPropagation();deleteSubject($index)"
-                      style="position: relative; top: -30px;left: 730px; font-size: 12px">Ja</span>
+<div class="container-fluid div-card" style="width: 960px">
+    <div class="row" style="margin-bottom: 10px; margin-top: 30px">
+        <div class="col-xs-6" id="loading-bar-container" ng-repeat="item in subjects track by $index">
+            <div ng-mouseenter="mouseOver[$index] = true" ng-mouseleave="mouseOver[$index] = false; delete[$index]=false"
+                 class="btn-subjects" ng-click="setTargetSubject(item)" align="left"
+                 ng-style="item.color ? {'background-color': '#'+item.color}:{'background-color': 'cornflowerblue'}">
+                <div class="container-fluid">
+                    <h2>
+                        <b>{{ item.name }}</b>
+                    </h2>
+                    <p style="font-size: 17px; margin-top: -2px">{{item.code}}</p>
+                </div>
+                <div ng-show="mouseOver[$index]" class="container-fluid">
+                    <span ng-show="!delete[$index]" class="glyphicon glyphicon-trash"
+                          style="font-size: 15px; position: absolute; top: 120px;left: 420px; cursor: pointer"
+                          ng-click="$event.stopPropagation(); delete[$index]=true"></span>
+                    <div ng-show="delete[$index]">
+                        <span style="position: absolute; top: 120px;left: 330px; font-size: 12px">Er du sikker?</span>
+                        <span ng-click="$event.stopPropagation();deleteSubject($index)"
+                              style="position: absolute; top: 120px;left: 420px; font-size: 12px">Ja</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+
 <script type="text/ng-template" id="addSubjectModal.html">
     <div class="modal-body">
         <div class="container-fluid" style="width: 400px;margin-bottom: 15px">
-            <h3>Ny fagpakke</h3>
+            <h3>Nytt fag</h3>
         </div>
         <div class="container-fluid" style="width: 400px; margin-bottom: 15px">
             <input id="newSubjectCode" class="form-control" placeholder="Fagkode" ng-model="newSubjectCode"
@@ -39,7 +57,7 @@
             <input id="newSubjectName" class="form-control" placeholder="Navn på pakken" ng-model="newSubjectName">
         </div>
         <div class="container-fluid" align="center" style="width: 400px">
-            <button class="btn btn-success" ng-click="addSubject()" style="width: 45%">Lag pakke</button>
+            <button class="btn btn-primary" ng-click="addSubject()" style="width: 45%; background-color: cornflowerblue">Lag pakke</button>
             <button class="btn btn-default" ng-click="cancel()" style="width: 45%">Avbryt</button>
         </div>
 

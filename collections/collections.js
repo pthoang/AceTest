@@ -138,11 +138,13 @@ angular.module('myApp.collections', ['ngRoute'])
             initCollections($scope.subject);
             $scope.changesMade = {};
             $scope.changesMade.value = false;
+            console.log($scope.reportInfo)
             var modalInstance = $uibModal.open({
                 animation: true,
                 templateUrl: 'reportModal.html',
                 controller: 'reportModalCtrl',
                 windowClass: 'app-modal-large',
+                backdrop: 'static',
                 resolve: {
                     reportInfo: function () {
                         return $scope.reportInfo
@@ -167,17 +169,21 @@ angular.module('myApp.collections', ['ngRoute'])
 
     })
     .controller('reportModalCtrl', function ($scope, $http, $uibModalInstance, $routeParams,
-                                             $q, reportInfo, changesMade, subjectService, requestService, apiUrl) {
+                                             $q, reportInfo, changesMade, subjectService, requestService, apiUrl, focus, alertify) {
         $scope.changesMade = changesMade;
         $scope.reportInfo = reportInfo;
         $scope.extraProperty = {};
-
-        var previewMaxLength = 200;
+        $scope.limitReports = 3;
+        $scope.showLimitAlt = {};
+        $scope.inDeleteReportList = {};
+        $scope.maxLengthAlternatives = 200;
+        $scope.maxLengthQuestion = 500;
+        //var previewMaxLength = 200;
         var initReportInfo = function (reportInfo) {
             angular.forEach(reportInfo, function (item) {
                 item.lastAdded = item.reports[0].created;
-                item.preview = item.exercise.content.question.text.length > previewMaxLength ?
-                    item.exercise.content.question.text.substr(0, previewMaxLength): item.exercise.content.question.text;
+                // item.preview = item.exercise.content.question.text.length > previewMaxLength ?
+                //     item.exercise.content.question.text.substr(0, previewMaxLength): item.exercise.content.question.text;
             });
             $scope.reportInfo.sort(function (a, b) {
                 return a.lastAdded < b.lastAdded ? -1:1;
@@ -221,33 +227,49 @@ angular.module('myApp.collections', ['ngRoute'])
 
         };
 
-        $scope.closeActiveExercise = function () {
-            $scope.extraProperty = {};
-            if($scope.activeExercise != undefined) {
-                if($scope.exercise.type == 'mc') {
-                    filterAlternativeArray($scope.mcAlternatives);
-                    $scope.exercise.content.corrects = [];
-                    $scope.exercise.content.wrongs = [];
-                    angular.forEach($scope.mcAlternatives, function (alternative) {
-                        if(alternative.correct) {
-                            $scope.exercise.content.corrects.push({answer: alternative.answer});
-                        } else {
-                            $scope.exercise.content.wrongs.push({answer: alternative.answer})
+        $scope.choseActiveExercise = function (index) {
+            if(index != $scope.activeExercise) {
+                $scope.extraProperty = {};
+                $scope.limitReports = 3;
+                if($scope.activeExercise != undefined) {
+                    var exercise = $scope.reportInfo[$scope.activeExercise].exercise;
+                    var activeIndex = $scope.activeExercise;
+                    if(exercise.type == 'mc') {
+                        filterAlternativeArray($scope.mcAlternatives);
+                        exercise.content.corrects = [];
+                        exercise.content.wrongs = [];
+                        angular.forEach($scope.mcAlternatives, function (alternative) {
+                            if(alternative.correct) {
+                                exercise.content.corrects.push({answer: alternative.answer});
+                            } else {
+                                exercise.content.wrongs.push({answer: alternative.answer})
+                            }
+                        });
+                        if(exercise.content.corrects.length == 0) {
+                            exercise.content.corrects.push({answer: ''})
                         }
-                    });
-                    if($scope.exercise.content.corrects.length == 0) {
-                        $scope.exercise.content.corrects.push({answer: ''})
+                        if($scope.reportInfo[$scope.activeExercise].exercise.content.wrongs.length == 0) {
+                            exercise.content.wrongs.push({answer: ''})
+                        }
                     }
-                    if($scope.exercise.content.wrongs.length == 0) {
-                        $scope.exercise.content.wrongs.push({answer: ''})
-                    }
-
+                    requestService.httpPut('/exercises/' + exercise.id, exercise)
+                        .then(function (response) {
+                            console.log(response);
+                            $scope.changesMade.value = true;
+                            alertify.success('Oppgaven lagret');
+                            delete exercise.error
+                        }, function (response) {
+                            console.log(response);
+                            console.log(exercise);
+                            alertify.error('En feil oppstod ved lagring av oppgaven');
+                            exercise.error = true
+                        })
                 }
-
             }
-            $scope.activeExercise = undefined;
+            $scope.activeExercise = index;
         };
 
+        //************************MC-specific functions***************************
         $scope.addAlternative = function (exercise) {
             $scope.mcAlternatives.push({answer: "", correct: false});
         };
@@ -288,6 +310,15 @@ angular.module('myApp.collections', ['ngRoute'])
 
         $scope.makeCorrect = function (exercise, index) {
             $scope.mcAlternatives[index].correct = true;
+        };
+        //******************************************************************************
+
+        //************************TF-specific functions***************************
+        $scope.changeAnswer = function (event, exercise) {
+            if(event.keyCode==13 && !event.shiftKey) {
+                event.preventDefault();
+                exercise.content.correct.answer = !exercise.content.correct.answer
+            }
         };
 
         $scope.getImage = function (image) {
@@ -345,8 +376,6 @@ angular.module('myApp.collections', ['ngRoute'])
                 }
                 requestService.httpPut('/exercises/' + $scope.exerciseInfo.exercise.id, $scope.exercise).then(function () {
                     var deleteReportRequests = [];
-
-                    $scope.changesMade.value = true;
                     angular.forEach($scope.removeElements, function (value) {
                         if(value) {
                             deleteReportRequests.push(requestService.httpDelete('/reports/' + value))
@@ -355,41 +384,32 @@ angular.module('myApp.collections', ['ngRoute'])
                     $q.all(deleteReportRequests).then(function (response) {
                         requestService.httpGet('/subjects/' + $routeParams.subjectId + '/reports')
                             .then(function (response) {
-                                $scope.reportInfo = response;
-                                initReportInfo($scope.reportInfo);
-                                $scope.extraProperty = {};
-                                $scope.activeExercise = undefined;
-                                $scope.exercise = undefined;
                             })
                     });
+                    $scope.changesMade.value = true;
+                    $scope.reportInfo = response;
+                    initReportInfo($scope.reportInfo);
+                    $scope.extraProperty = {};
+                    $scope.activeExercise = undefined;
+                    $scope.exercise = undefined;
                 })
 
             });
         };
 
-        $scope.removeAllReports = function (index) {
-            var confirmRemoveAll = confirm('Sikker på at du vil slette alle tilbakemeldingene?');
-            if(confirmRemoveAll){
-                $http({
-                    url: apiUrl + '/reports/' + $scope.exercises[index].exerciseId,
-                    method: 'PUT',
-                    data: {
-                        reports: []
-                    }
-                }).success(function () {
-                    $scope.exercises.splice(index, 1);
-                });
+        $scope.deleteReport = function (reports, index) {
+            if(!$scope.inDeleteReportList[index]) {
+                $scope.inDeleteReportList[index] = true;
+            } else {
+                requestService.httpDelete('/reports/' + reports[index].id)
+                    .then(function (response) {
+                        delete $scope.inDeleteReportList[index];
+                        reports.splice(index, 1);
+                        console.log(response)
+                    });
             }
         };
 
-        $scope.goToOverview = function () {
-
-            $scope.extraProperty = {};
-            $scope.exercise = undefined;
-            $scope.activeExercise = undefined;
-            console.log(subjectService.getSubject())
-            
-        };
         $scope.cancel = function () {
             $scope.exercise = undefined;
         };

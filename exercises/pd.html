@@ -1,26 +1,36 @@
 
 <div class="container-fluid" ng-if="exerciseNumber == activeExercise">
-    <div class="row">
-        <div class="col-xs-1">
+    <div class="row" style="margin-bottom: 5px">
+        <div class="col-xs-1" align="center">
             <span class="glyphicon glyphicon-question-sign" style="font-size: 25px; margin-top: 5px"></span>
         </div>
         <div class="col-xs-11">
-            <textarea id="activeQuestion" msd-elastic class="open-text-input textarea-edit" rows="1" ng-model="exercise.content.question.text" placeholder="Frase">
+            <textarea id="activeQuestion" msd-elastic class="open-text-input textarea-edit" rows="1" ng-model="exercise.content.question.text" placeholder="Frase"
+                      ng-focus="showLimitQ=true" ng-blur="showLimitQ=false">
             </textarea>
+            <div ng-show="showLimitQ && !collection.webOnly" ng-style="exercise.content.question.text.length>maxLengthQuestion? {'color': 'red'}: {}" style="float: right; margin-top: -13px">
+                <span>{{exercise.content.question.text.length}}/{{maxLengthQuestion}}</span>
+                <span ng-show="exercise.content.question.text.length>maxLengthQuestion">: Denne teksten kan være for lang for å vises riktig i mobil-appene</span>
+            </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-xs-1">
+        <div class="col-xs-1" align="center">
             <span class="glyphicon glyphicon-ok-sign" style="font-size: 25px; margin-top: 5px"></span>
         </div>
         <div class="col-xs-11">
-            <textarea msd-elastic class="open-text-input textarea-edit" rows="1" ng-model="exercise.content.correct.answer" placeholder="Definisjon">
+            <textarea msd-elastic class="open-text-input textarea-edit" rows="1" ng-model="exercise.content.correct.answer" placeholder="Definisjon"
+                      ng-focus="showLimitA = true" ng-blur="showLimitA = false">
             </textarea>
+            <div ng-show="showLimitA && !collection.webOnly" ng-style="exercise.content.correct.answer.length>maxLengthAlternatives? {'color': 'red'}: {}" style="float: right; margin-top: -13px">
+                <span>{{exercise.content.correct.answer.length}}/{{maxLengthAlternatives}}</span>
+                <span ng-show="exercise.content.correct.answer.length>maxLengthAlternatives">: Denne teksten kan være for lang for å vises riktig i mobil-appene</span>
+            </div>
         </div>
 
     </div>
     <div class="row">
-        <div class="col-xs-1">
+        <div class="col-xs-1" align="center">
             <span class="glyphicon glyphicon-tags" style="font-size: 25px; margin-top: 15px"></span>
         </div>
         <div class="col-xs-11">

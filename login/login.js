@@ -3,6 +3,10 @@ angular.module('myApp.login', ['ngRoute', 'base64'])
 
     .controller('loginCtrl',function ($scope, $http, $cookies, $base64, $location, apiUrl,Auth) {
 
+        if($cookies.getObject('token')) {
+            $location.path('/subjects')
+        };
+
         $scope.authenticate =function () {
             $http({
                 url: apiUrl + '/users/authentication',
@@ -18,7 +22,6 @@ angular.module('myApp.login', ['ngRoute', 'base64'])
                 });
                 $cookies.putObject('admin', response.admin);
                 $cookies.putObject('username', $scope.username);
-                $cookies.putObject('password', $scope.password);
                 Auth.setToken($cookies.getObject('token'));
                 $location.path('/subjects')
 

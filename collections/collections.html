@@ -1,4 +1,4 @@
-<div class="container-fluid" align="center" style="width: 100%; height: 100vh" ng-click="unFocus()">
+<div class="container-fluid" align="center" style="width: 100%; min-height: 100vh" ng-click="unFocus()">
     <div class="div-card" ng-mouseenter="showExtendButton = true" ng-mouseleave="showExtendButton = false" style="width:960px;margin-bottom: 20px; position: relative" align="left">
         <div class="header-collections">
             <div ng-click="$event.stopPropagation(); setEditTrue('subjectName')" class="container-fluid" style="width: 95%">
@@ -7,7 +7,7 @@
                     {{subject.name}}
                 </b></h1>
                 <textarea id="subjectName" ng-keypress="$event.keyCode==13 && unFocus()" ng-if="editSubjectName || subject.name.length==0" msd-elastic ng-model="subject.name"
-                    rows = 1 class="open-text-input" placeholder="Navn på pakken"
+                    rows = 1 class="open-text-input" placeholder="Navn på faget"
                     style="font-size: 40px; font-weight: bold;width: 70%; margin-top: 7px; margin-left: -7px">
                 </textarea>
             </div>
@@ -17,12 +17,12 @@
         </div>
         <div style="margin-top: 20px">
             <div class="container-fluid" style="width:95%; color: cornflowerblue; font-weight: bold; margin-bottom: 20px">
-                <span style="cursor: pointer;"></b>Oppdateringer(0)</span>
+                <span style="cursor: pointer;"></b>Oppdateringer (0)</span>
                 <span>/</span>
                 <span style="cursor: pointer;" ng-click="openReportModal()">Tilbakemeldinger ({{reportInfo.length}})</span>
             </div>
             <div ng-click="$event.stopPropagation(); setEditTrue('subjectDescription')" class="container-fluid" style="width:95%;">
-                <p ng-if="!editSubjectDescription && !subject.description.length==0"
+                <p ng-if="!editSubjectDescription && !(subject.description.length==0)"
                     style="font-size: 18px">
                     {{subject.description}}
                 </p>
@@ -112,32 +112,63 @@
     <div class="modal-header">
         <h3>Tilbakemeldinger</h3>
     </div>
-    <div class="modal-body" style="background-color: #F1F1F2" ng-click="closeActiveExercise()">
-        <div ng-show="!exercise" class="container-fluid div-card" style="width: 960px;">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th style="width: 15%">Dato siste</th>
-                        <th style="width: 46%">Oppgave</th>
-                        <th style="width: 15%">Antall tilbakemeldinger</th>
-                        <th style="width: 4%"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-mouseenter="focused[$index] = true" ng-mouseleave="focused[$index] = false" ng-repeat="exercise in reportInfo track by $index">
-                        <td ng-click="onChosenExercise($index)" style="cursor: pointer">{{exercise.lastAdded | date:'dd.MM.yyyy hh.mm'}}</td>
-                        <td ng-click="onChosenExercise($index)" style="cursor: pointer">{{exercise.preview}}</td>
-                        <td ng-click="onChosenExercise($index)" style="cursor: pointer" align="center">{{exercise.reports.length}}</td>
-                        <td align="center"><span ng-show="focused[$index]" class="glyphicon glyphicon-remove" ng-click="removeAllReports($index)" style="cursor: pointer"></span></td>
-                    </tr>
-                </tbody>
+    <div class="modal-body" style="background-color: #F1F1F2; height: 650px; overflow-y: scroll" ng-click="choseActiveExercise(undefined)">
+        <div ng-click="$event.stopPropagation(); choseActiveExercise($index)" ng-repeat="info in reportInfo track by $index" class="container-fluid div-card"
+             style="width: 960px; margin-bottom: 10px; position: relative">
+            <div class="row" style="margin-bottom: 10px">
+                <div class="col-xs-11">
+                    <div align="right" style="position: absolute;top: 5px;right:-30px;" ng-show="exercise.error">
+                        <span class="glyphicon glyphicon-exclamation-sign"></span>
+                    </div>
+                    <div class="container-fluid" style="margin-top: 10px"></div>
+                    <div ng-if="info.exercise.type == 'pd'" ng-include="'exercises/pd.html'"
+                         onload="exerciseNumber = $index; exercise = info.exercise"></div>
+                    <div ng-if="info.exercise.type == 'mc'" ng-include="'exercises/mc.html'"
+                         onload="exerciseNumber = $index; exercise = info.exercise"></div>
+                    <div ng-if="info.exercise.type == 'tf'" ng-include="'exercises/tf.html'"
+                         onload="exerciseNumber = $index; exercise = info.exercise"></div>
+                    <div onload="exerciseNumber = $index; exercise = info.exercise" ng-include="'exercises/extrapropertyview.html'"></div>
+                </div>
 
-            </table>
+                <div ng-show="activeExercise != $index" style="position: absolute; bottom: 10px; right: 50px">
+                    <span style="color: red; font-size: 20px">{{info.reports.length}}</span>
+                    <span class="fa fa-exclamation-triangle" style="font-size: 20px; color: red;"></span>
+                </div>
+            </div>
+
+            <div ng-if="activeExercise == $index" class="col-xs-11" style="margin-bottom: 10px; margin-top: 10px">
+                <div class="row" ng-repeat="report in info.reports | limitTo:limitReports track by $index"
+                     ng-mouseenter="showDeleteReport[$index]=true" ng-mouseleave="showDeleteReport[$index]=false; inDeleteReportList[$index]=false">
+                    <div class="col-xs-1" align="center">
+                        <span class="fa fa-exclamation-triangle" style="font-size: 20px; color: red"></span>
+                    </div>
+                    <div class="col-xs-8">
+                        <p ng-show="!inDeleteReportList[$index]" style="color: red">
+                            {{report.created | date: 'dd.MM.yyyy hh.mm'}}: {{report.message}}
+                        </p>
+                        <p ng-show="inDeleteReportList[$index]" style="color: red">
+                            <del>{{report.created | date: 'dd.MM.yyyy hh.mm'}}: {{report.message}}</del>
+                        </p>
+                    </div>
+                    <div class="col-xs-2">
+                        <span ng-show="inDeleteReportList[$index]" style="font-size: 10px">Klikk igjen for å bekrefte</span>
+                    </div>
+                    <div class="col-xs-1">
+                        <span ng-show="showDeleteReport[$index]" class="glyphicon glyphicon-trash"
+                              ng-click="deleteReport(info.reports, $index)" style="cursor: pointer"></span>
+                    </div>
+                </div>
+                <div ng-show="info.reports.length > limitReports" class="row">
+                    <div class="col-xs-1" align="center">
+                        <span class="glyphicon glyphicon-option-horizontal" style="font-size: 20px; cursor: pointer" ng-click="limitReports = info.reports.length"></span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div ng-show="exercise" class="container-fluid">
             <span ng-click="goToOverview()" class="glyphicon glyphicon-chevron-left" align="left" style="cursor: pointer; margin-bottom: 20px">
-                Alle tilbakemeldinger
             </span>
+            <span>Alle tilbakemeldinger</span>
             <div class="container-fluid div-card" style="width: 960px; margin-bottom: 20px">
                 <div class="row" style="margin-top: 20px; margin-bottom: 20px">
                     <div ng-repeat="reportArray in exerciseReportArrays track by $index">

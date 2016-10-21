@@ -1,17 +1,42 @@
-<div class="container-fluid" style="width: 100%; height: 100vh" ng-click="choseActiveExercise(undefined)">
+<div class="container-fluid" style="width: 100%; min-height: 100vh" ng-click="choseActiveExercise(undefined)">
     <div id="mainDiv" class="container-fluid" style="width:960px">
         <h4 ng-click="backToSubjectPage()" style="color: cornflowerblue; cursor: pointer">Gå tilbake til {{subjectName}}</h4>
         <div ng-click="$event.stopPropagation(); setEditCollectionNameTrue()" class="container-fluid div-card header-exercises" style="width: 100%; margin-bottom: 20px;">
-            <div ng-if="!editCollectionName.value && !collection.name.length==0" class="container-fluid"
+            <div ng-if="!editCollectionName.value && !collection.name.length==0" class="col-xs-10"
                  style="margin-top: 15px; margin-bottom: 15px">
                 <h2 style="font-size: 25px; margin-top: 10px"><b>{{collection.name}}</b></h2>
             </div>
-            <div ng-if="editCollectionName.value || collection.name.length==0" class="container-fluid" ng-click="$event.stopPropagation()"
+            <div ng-if="editCollectionName.value || collection.name.length==0" class="col-xs-10" ng-click="$event.stopPropagation()"
                  style="margin-top: 10px; margin-bottom: 10px; margin-left: -7px">
-                <textarea id="collectionName" ng-keypress="$event.keyCode==13 && choseActiveExercise(undefined)" msd-elastic class="open-text-input" ng-model="collection.name"
-                       placeholder="Navn på oppgavesett"
+                <textarea id="collectionName" ng-keypress="$event.keyCode==13 && choseActiveExercise(undefined)"
+                          msd-elastic class="open-text-input" ng-model="collection.name"
+                       placeholder="Navn på oppgavesett" maxlength="90"
                        style="font-size: 25px; font-weight: bold; margin-top: 5px; resize: none" rows="1">
                 </textarea>
+                <span style="float: right; margin-top: -13px">{{90-collection.name.length}}</span>
+            </div>
+            <div ng-click="$event.stopPropagation()" class="col-xs-2">
+                <div style="margin-top: 10px">
+                    <p>Tilgjengelighet:</p>
+                    <div ng-show="!collection.webOnly">
+                        <span style="margin-right: 20px">
+                            <span class="fa fa-mobile" style="font-size: 30px"></span>
+                            <span class="fa fa-desktop" style="font-size: 30px"></span>
+                        </span>
+                        <span style="color: lightgrey; cursor: pointer" ng-click="changeWebOnly(true)">
+                            <span class="fa fa-desktop" style="font-size: 20px"></span>
+                        </span>
+                    </div>
+                    <div ng-show="collection.webOnly">
+                        <span style="margin-right: 20px; color: lightgrey; cursor: pointer" ng-click="changeWebOnly(false)">
+                            <span class="fa fa-mobile" style="font-size: 20px;"></span>
+                            <span class="fa fa-desktop" style="font-size: 20px;"></span>
+                        </span>
+                        <span>
+                            <span class="fa fa-desktop" style="font-size: 30px"></span>
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
         <div>
@@ -36,12 +61,13 @@
             <div as-sortable="dragControlListeners" ng-model="collection.exercises">
                 <div class="container-fluid" as-sortable-item ng-repeat="exercise in collection.exercises track by $index"
                      ng-model="exercise" style="margin-bottom: 10px;">
-                    <div class="container-fluid div-card" as-sortable-item-handle style="cursor: default; width: 100%; position: relative" ng-mouseenter="focused[$index] = true"
+                    <div class="container-fluid div-card" as-sortable-item-handle style="cursor: default; width: 100%; position: relative"
+                         ng-style="exercise.error ? {'border': '2px solid red'} : {}" ng-mouseenter="focused[$index] = true"
                          ng-mouseleave="focused[$index] = false; confirmDelete[$index] = false">
                         <div class="container-fluid" style="margin-top: 30px"></div>
                         <div no-drag class="row" style="margin-bottom: 30px">
                             <div class="col-xs-11">
-                                <div no-drag align="right" style="position: absolute;top:-10px;right:-44px;" ng-show="isInErrorList($index)">
+                                <div no-drag align="right" style="position: absolute;top:-10px;right:-44px;" ng-show="exercise.error">
                                     <span class="glyphicon glyphicon-exclamation-sign"></span>
                                 </div>
 
@@ -57,7 +83,7 @@
                                             <!--</div>-->
                                         <!--</div>-->
                                     <!--</div>-->
-                                    <div ng-if="$index != activeExercise" class="container-fluid" style="margin-top: -20px">
+                                    <div class="container-fluid" style="margin-top: -20px">
                                         <p style="color: lightgrey;">{{typeDesc[exercise.type]}}</p>
                                     </div>
                                     <div onload="exerciseNumber = $index" ng-include="'exercises/imageview.html'"></div>
@@ -86,6 +112,14 @@
             </div>
 
         </div>
+    </div>
+    <div ng-show="typeChoser" id="typeChoser" tabindex="0" class="container-fluid div-card" ng-keypress="choseType($event)" ng-blur="typeChoser=false"
+    style="margin-bottom: 20px">
+        <h3>Velg oppgavetype</h3>
+        <span style="font-size: 20px; margin-right: 10px">1. Multiple Choice</span>
+        <span style="font-size: 20px; margin-right: 10px">2. Phrase-Definition</span>
+        <span style="font-size: 20px; margin-right: 10px">3. True/False</span>
+        <div style="height: 10px"></div>
     </div>
 
     <div ng-show="collection.exercises.length > 0">

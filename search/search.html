@@ -21,7 +21,7 @@
         </div>
         <div class="col-xs-1"></div>
         <div class="col-xs-9 div-card">
-            <div ng-repeat="result in getResults(currentPage)" class="row search-result" style="border-bottom: 1px solid #cccccc; cursor: pointer">
+            <div ng-repeat="result in getResults(currentPage.value)" class="row search-result" style="border-bottom: 1px solid #cccccc; cursor: pointer">
                 <div ng-if="result.resource=='subjects'" ng-include="'search/searchTemplates/subjects.html'"></div>
                 <div ng-if="result.resource=='collections'" ng-include="'search/searchTemplates/collections.html'"></div>
                 <div ng-if="result.resource=='exercises'" ng-include="'search/searchTemplates/exercises.html'"></div>
@@ -35,7 +35,7 @@
             </div>
             <div class="col-xs-9" align="center">
                 <ul class="pagination-sm" uib-pagination total-items="resultList.length" ng-change="scrollTopResult()"
-                    ng-model="currentPage" max-size="5" next-text="Neste" previous-text="Forrige"></ul>
+                    ng-model="currentPage.value" max-size="5" next-text="Neste" previous-text="Forrige" force-ellipses="true"></ul>
             </div>
         </div>
     </div>

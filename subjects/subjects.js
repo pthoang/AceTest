@@ -6,6 +6,7 @@ angular.module('myApp.subjects', ['ngRoute', 'ui.checkbox'])
     .controller('subjectsCtrl', function ($scope, $http, $cookies, $base64, $uibModal,$location, subjectService, requestService, apiUrl) {
         $scope.deleteMode = false;
         $scope.mouseOver = {};
+        $scope.userName = $cookies.getObject('username');
         requestService.httpGet("/subjects")
             .then(function (response) {
                 console.log(response);

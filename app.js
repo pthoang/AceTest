@@ -23,10 +23,10 @@ angular.module('myApp', [
         'as.sortable',
         'uiSwitch',
         'ngAlertify',
-        'monospaced.elastic']
+        'monospaced.elastic',
+        'cfp.hotkeys']
     )
     .config(['$locationProvider', '$routeProvider','apiUrl',function ($locationProvider, $routeProvider, apiUrl) {
-
         $routeProvider
             .when("/login", {
                 templateUrl: "login/login.html",
@@ -68,6 +68,9 @@ angular.module('myApp', [
 
 
     }])
+    .config(function (hotkeysProvider) {
+        hotkeysProvider.includeCheatSheet = false;
+    })
     .controller('mainController', function ($scope, $window, $location, $http, $q, Auth, $cookies,$rootScope,PreviousState) {
         $scope.isCollapsed = true;
 
@@ -94,7 +97,6 @@ angular.module('myApp', [
                 Auth.setToken(false);
                 $cookies.remove('token');
                 $cookies.remove('username');
-                $cookies.remove('password');
                 $cookies.remove('admin');
                 $location.path('/login');
             }
@@ -103,7 +105,7 @@ angular.module('myApp', [
     })
 
     .constant("apiUrl", "https://acepi-test2.herokuapp.com")
-    //.constant("apiUrl", "http://10.22.32.119:3000")
+    //.constant("apiUrl", "http://10.22.33.218:3000")
     //.constant("apiUrl", "https://acepi.herokuapp.com/subjects")
     .factory('focus', function ($timeout, $window) {
         return function (id) {

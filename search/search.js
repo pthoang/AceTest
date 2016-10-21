@@ -1,15 +1,16 @@
 angular.module('myApp.search', ["ngRoute"])
     .controller('searchCtrl', function ($scope, $http, $uibModal, $timeout, apiUrl) {
 
-        $scope.currentPage = 1;
+        $scope.currentPage = {};
         $scope.searchItems = function () {
             $http({
                 url: apiUrl + "/search?q=" + $scope.searchTerms.replace(/[\s]/g, '_') + "&r=subjects+exercises+collections",
                 method: 'GET'
 
             }).success(function (response) {
-                $scope.currentPage=1;
+                $scope.currentPage.value = 1;
                 $scope.resultList = response;
+                console.log(response);
             })
         };
 
