@@ -20,7 +20,7 @@
         <div class="col-xs-6" id="loading-bar-container" ng-repeat="item in subjects track by $index">
             <div ng-mouseenter="mouseOver[$index] = true" ng-mouseleave="mouseOver[$index] = false; delete[$index]=false"
                  class="btn-subjects" ng-click="setTargetSubject(item)" align="left"
-                 ng-style="item.color ? {'background-color': '#'+item.color}:{'background-color': 'cornflowerblue'}">
+                 ng-style="item.color ? {'background-color': item.color}:{'background-color': 'cornflowerblue'}">
                 <div class="container-fluid">
                     <h2>
                         <b>{{ item.name }}</b>

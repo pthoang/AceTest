@@ -1,6 +1,7 @@
 <div class="container-fluid" align="center" style="width: 100%; min-height: 100vh" ng-click="unFocus()">
     <div class="div-card" ng-mouseenter="showExtendButton = true" ng-mouseleave="showExtendButton = false" style="width:960px;margin-bottom: 20px; position: relative" align="left">
-        <div class="header-collections">
+        <div class="header-collections"
+             ng-style="subject.color? {'background-color': subject.color}:{}">
             <div ng-click="$event.stopPropagation(); setEditTrue('subjectName')" class="container-fluid" style="width: 95%">
                 <h1 ng-if="!editSubjectName && !subject.name.length==0"
                     style="margin-top: 20px; font-size: 40px; width: 70%;"><b>
@@ -16,10 +17,22 @@
             </div>
         </div>
         <div style="margin-top: 20px">
-            <div class="container-fluid" style="width:95%; color: cornflowerblue; font-weight: bold; margin-bottom: 20px">
-                <span style="cursor: pointer;"></b>Oppdateringer (0)</span>
-                <span>/</span>
-                <span style="cursor: pointer;" ng-click="openReportModal()">Tilbakemeldinger ({{reportInfo.length}})</span>
+            <div class="container-fluid" style="width:95%;font-weight: bold; margin-bottom: 20px"
+                 ng-style="subject.color? {'color': subject.color}:{'color': 'cornflowerblue'}">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <span style="cursor: pointer;"></b>Oppdateringer (0)</span>
+                        <span>/</span>
+                        <span style="cursor: pointer;" ng-click="openReportModal()">Tilbakemeldinger ({{reportInfo.length}})</span>
+                    </div>
+                    <div class="col-xs-4"></div>
+                    <div class="col-xs-2">
+                        <span style="cursor: pointer;" uib-popover-template="'colorPickerPopoverTemplate.html'"
+                              popover-trigger="outsideClick" popover-is-open="colorPopover" type="button">
+                            Endre farge
+                        </span>
+                    </div>
+                </div>
             </div>
             <div ng-click="$event.stopPropagation(); setEditTrue('subjectDescription')" class="container-fluid" style="width:95%;">
                 <p ng-if="!editSubjectDescription && !(subject.description.length==0)"
@@ -37,13 +50,17 @@
         <div class="container-fluid" style="height: 10px"></div>
 
         <form style="position:absolute;top:20px;right:10px;">
-            <label class="btn btn-collections" ng-click="previewSubject()">Preview</label>
+            <label class="btn btn-collections" ng-click="previewSubject()"
+                   ng-style="subject.color? {'background-color': subject.color}:{}">Preview</label>
             <div ng-if="admin">
-                <label ng-if="subject.published!='yes'" class="btn btn-collections" ng-click="publishSubject('yes')">Publiser</label>
-                <label ng-if="subject.published!='no'" class="btn btn-collections" ng-click="publishSubject('no')">Avpubliser</label>
+                <label ng-if="subject.published!='yes'" class="btn btn-collections" ng-click="publishSubject('yes')"
+                       ng-style="subject.color? {'background-color': subject.color}:{}">Publiser</label>
+                <label ng-if="subject.published!='no'" class="btn btn-collections" ng-click="publishSubject('no')"
+                       ng-style="subject.color? {'background-color': subject.color}:{}">Avpubliser</label>
             </div>
             <div ng-if="!admin">
-                <label ng-if="subject.published=='no'" class="btn btn-collections" ng-click="publishSubject('pending')">Publiser</label>
+                <label ng-if="subject.published=='no'" class="btn btn-collections" ng-click="publishSubject('pending')"
+                       ng-style="subject.color? {'background-color': subject.color}:{}">Publiser</label>
                 <p ng-if="subject.published=='pending'" style="color: white">Gjøres offentlig innen kort tid...</p>
             </div>
         </form>
@@ -51,17 +68,20 @@
     </div>
 
     <div class="div-card" style="width:960px; margin-bottom: 30px" align="left">
-        <div class="header-collections" style="height: 70px; margin-bottom: 20px">
+        <div class="header-collections" style="height: 70px; margin-bottom: 20px"
+             ng-style="subject.color? {'background-color': subject.color}:{}">
             <div class="container-fluid" style="width: 95%; padding-bottom: 15px">
                 <h3><b>Oppgavesett</b></h3>
             </div>
             <form style="position: relative; top: -55px; left: 585px; width: 400px;">
-                <label class="btn btn-collections" ng-click="setTargetCollection('new')" style="width:45%;">
-                    <span class="glyphicon glyphicon-plus-sign"></span>
-                    Nytt oppgavesett
+                <label class="btn btn-collections" ng-click="setTargetCollection('new')" style="width:45%;"
+                       ng-style="subject.color? {'background-color': subject.color}:{}">
+                    <span class="glyphicon glyphicon-plus-sign" style="margin-top: 2px"></span>
+                    <span>Nytt oppgavesett</span>
                 </label>
-                <label class="btn btn-collections" ng-click="goTo('subjects/'+subject.id+'/add')" style="width:45%;">
-                    <span class="glyphicon glyphicon-circle-arrow-down"></span>
+                <label class="btn btn-collections" ng-click="goTo('subjects/'+subject.id+'/add')" style="width:45%;"
+                       ng-style="subject.color? {'background-color': subject.color}:{}">
+                    <span class="glyphicon glyphicon-circle-arrow-down" style="margin-top: 2px"></span>
                     Hent oppgavesett
                 </label>
             </form>
@@ -102,10 +122,8 @@
                 </div>
             </div>
         </div>
-
-
     </div>
-
+    </div>
 </div>
 
 <script type="text/ng-template" id="reportModal.html">
@@ -165,47 +183,16 @@
                 </div>
             </div>
         </div>
-        <div ng-show="exercise" class="container-fluid">
-            <span ng-click="goToOverview()" class="glyphicon glyphicon-chevron-left" align="left" style="cursor: pointer; margin-bottom: 20px">
-            </span>
-            <span>Alle tilbakemeldinger</span>
-            <div class="container-fluid div-card" style="width: 960px; margin-bottom: 20px">
-                <div class="row" style="margin-top: 20px; margin-bottom: 20px">
-                    <div ng-repeat="reportArray in exerciseReportArrays track by $index">
-                        <div class="col-xs-6">
-                            <div ng-repeat="report in reportArray track by $index" class="container-fluid">
-                                <p ng-show="!removeElements[$parent.$index*splitPoint + $index]"
-                                   ng-click="removeElements[$parent.$index*splitPoint + $index]= report.id"
-                                   style="cursor: pointer">
-                                    {{report.created | date:'dd.MM.yyyy hh.mm'}}, {{report.message}}
-                                </p>
-                                <del ng-show="removeElements[$parent.$index*splitPoint + $index]"
-                                     ng-click="removeElements[$parent.$index*splitPoint + $index]=undefined"
-                                     style="cursor: pointer">
-                                    <p>{{report.created | date:'dd.MM.yyyy hh.mm'}}, {{report.message}}</p>
-                                </del>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="container-fluid div-card" ng-click="$event.stopPropagation(); activeExercise = 0" style="width: 960px;">
-                <div class="container-fluid" style="margin-top: 30px"></div>
-                <div onload="exerciseNumber = 0" ng-include="'exercises/imageview.html'"></div>
-
-                <div ng-if="exercise.type == 'pd'" ng-include="'exercises/pd.html'"
-                     onload="exerciseNumber = 0"></div>
-                <div ng-if="exercise.type == 'mc'" ng-include="'exercises/mc.html'"
-                     onload="exerciseNumber = 0"></div>
-                <div ng-if="exercise.type == 'tf'" ng-include="'exercises/tf.html'"
-                     onload="exerciseNumber = 0"></div>
-                <div onload="exerciseNumber = 0" ng-include="'exercises/extrapropertyview.html'"></div>
-                <div class="container-fluid" style="margin-top: 30px"></div>
-            </div>
-        </div>
     </div>
     <div class="modal-footer">
         <button ng-show="exercise" type="button" class="btn btn-primary" ng-click="saveChanges()">Lagre</button>
         <button type="button" class="btn btn-default" ng-click="close()">Lukk</button>
+    </div>
+</script>
+
+<script type="text/ng-template" id="colorPickerPopoverTemplate.html">
+    <div>
+        <ngjs-color-picker selected-color="selectedColor" custom-colors="customColors" options="colorPickerOptions"
+        ng-click="selectColor(selectedColor)"></ngjs-color-picker>
     </div>
 </script>

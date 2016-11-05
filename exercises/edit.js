@@ -49,7 +49,7 @@ angular.module('myApp.edit', ['ngRoute'])
         $scope.maxLengthAlternatives = 200;
         $scope.maxLengthQuestion = 500;
         if(subjectService.getSubject()) {
-            $scope.subjectName = subjectService.getSubject().name;
+            $scope.subject = subjectService.getSubject();
         }
         //window.localStorage.setItem('refreshed', false);
 
@@ -207,8 +207,8 @@ angular.module('myApp.edit', ['ngRoute'])
         $scope.addExercise = function (type) {
             orderUpdate = true;
             var exercise = {
-                "type": type,
-                "content": {question: {}}
+                type: type,
+                content: {question: {}}
             };
             if(exercise.type == 'mc') {
                 exercise.content.corrects = [{answer: ""}];

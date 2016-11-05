@@ -1,7 +1,9 @@
 <div class="container-fluid" style="width: 100%; min-height: 100vh" ng-click="choseActiveExercise(undefined)">
     <div id="mainDiv" class="container-fluid" style="width:960px">
-        <h4 ng-click="backToSubjectPage()" style="color: cornflowerblue; cursor: pointer">Gå tilbake til {{subjectName}}</h4>
-        <div ng-click="$event.stopPropagation(); setEditCollectionNameTrue()" class="container-fluid div-card header-exercises" style="width: 100%; margin-bottom: 20px;">
+        <h4 ng-click="backToSubjectPage()" style="cursor: pointer"
+        ng-style="subject.color? {'color': subject.color}:{'color':'cornflowerblue'}">Gå tilbake til {{subject.name}}</h4>
+        <div ng-click="$event.stopPropagation(); setEditCollectionNameTrue()" class="container-fluid div-card header-exercises" style="width: 100%; margin-bottom: 20px;"
+        ng-style="subject.color ? {'color': subject.color, 'border': '3px solid ' + subject.color}:{}">
             <div ng-if="!editCollectionName.value && !collection.name.length==0" class="col-xs-10"
                  style="margin-top: 15px; margin-bottom: 15px">
                 <h2 style="font-size: 25px; margin-top: 10px"><b>{{collection.name}}</b></h2>
@@ -40,18 +42,7 @@
             </div>
         </div>
         <div>
-            <button class="btn btn-exercises" ng-click="$event.stopPropagation(); addExercise('mc')">
-                Multiple Choice
-            </button>
-            <button class="btn btn-exercises" ng-click="$event.stopPropagation(); addExercise('pd')">
-                Phrase-Definition
-            </button>
-            <button class="btn btn-exercises" ng-click="$event.stopPropagation(); addExercise('tf')">
-                True/False
-            </button>
-            <button class="btn btn-exercises" ng-click="$event.stopPropagation(); goToAddExercises()">
-                <span class="glyphicon glyphicon-circle-arrow-down"></span> Hent oppgaver
-            </button>
+            <div ng-include="'exercises/editBtn.html'"></div>
             <!--<button ng-click="saveCollection('goToSubject')" ng-disabled="saveClicked" class="btn btn-exercises">-->
                 <!--Lagre-->
             <!--</button>-->
@@ -123,18 +114,7 @@
     </div>
 
     <div ng-show="collection.exercises.length > 0">
-        <button class="btn btn-exercises" ng-click="$event.stopPropagation(); addExercise('mc')">
-            Multiple Choice
-        </button>
-        <button class="btn btn-exercises" ng-click="$event.stopPropagation(); addExercise('pd')">
-            Phrase-Definition
-        </button>
-        <button class="btn btn-exercises" ng-click="$event.stopPropagation(); addExercise('tf')">
-            True/False
-        </button>
-        <button class="btn btn-exercises" ng-click="$event.stopPropagation(); saveCollection('goToAdd')">
-            <span class="glyphicon glyphicon-circle-arrow-down"></span> Hent oppgaver
-        </button>
+        <div ng-include="'exercises/editBtn.html'"></div>
         <!--<button ng-click="saveCollection('goToSubject')" ng-disabled="saveClicked" class="btn btn-exercises">-->
             <!--Lagre-->
         <!--</button>-->

@@ -1,4 +1,4 @@
-angular.module('myApp.collections', ['ngRoute'])
+angular.module('myApp.collections', ['ngRoute', 'ngjsColorPicker'])
 
     .controller('collectionsCtrl', function ($scope, $window, $cookies, $http, $uibModal, $q, $routeParams, $location,
                                              subjectService, collectionService, requestService,alertify, focus) {
@@ -6,6 +6,14 @@ angular.module('myApp.collections', ['ngRoute'])
         $scope.subject = subjectService.getSubject();
         $scope.confirmDelete = {};
         $scope.admin = $cookies.getObject('admin');
+        $scope.customColors = ['#00B16A','#03C9A9','#049372','#16A085', '#1ba39c',
+            '#2574a9','#61B1D5','#5c97bf','#6C7A89','#89c4f4','#22A7F0','#045B9E','#38365E','#674172','#663399',
+            '#913D88','#D2527F','#DB0A5B','#D24D57','#F14743','#F64747','#D8270E','#AF4203','#9C2100','#FE4210','#d35400',
+            '#F2784B','#E88B0A','#FFA800','#F7C511','#F3D610','#FFB860'];
+        $scope.colorPickerOptions = {
+            columns: 8,
+            size: 30
+        };
 
         var initCollections = function (subject) {
             $scope.collections = subject.collections;
@@ -131,6 +139,84 @@ angular.module('myApp.collections', ['ngRoute'])
             }
             focus(id)
         };
+
+        $scope.selectColor = function (color) {
+            $scope.subject.color = color;
+            $scope.saveSubject();
+        };
+
+        //****************Sort colors*************
+        var Color = function Color(hexVal) { //define a Color class for the color objects
+            this.hex = hexVal;
+        };
+
+        var constructColor = function(colorObj){
+            var hex = colorObj.hex.substring(1);
+            /* Get the RGB values to calculate the Hue. */
+            var r = parseInt(hex.substring(0, 2), 16) / 255;
+            var g = parseInt(hex.substring(2, 4), 16) / 255;
+            var b = parseInt(hex.substring(4, 6), 16) / 255;
+
+            /* Getting the Max and Min values for Chroma. */
+            var max = Math.max.apply(Math, [r, g, b]);
+            var min = Math.min.apply(Math, [r, g, b]);
+
+
+            /* Variables for HSV value of hex color. */
+            var chr = max - min;
+            var hue = 0;
+            var val = max;
+            var sat = 0;
+
+
+            if (val > 0) {
+                /* Calculate Saturation only if Value isn't 0. */
+                sat = chr / val;
+                if (sat > 0) {
+                    if (r == max) {
+                        hue = 60 * (((g - min) - (b - min)) / chr);
+                        if (hue < 0) {
+                            hue += 360;
+                        }
+                    } else if (g == max) {
+                        hue = 120 + 60 * (((b - min) - (r - min)) / chr);
+                    } else if (b == max) {
+                        hue = 240 + 60 * (((r - min) - (g - min)) / chr);
+                    }
+                }
+            }
+            colorObj.chroma = chr;
+            colorObj.hue = hue;
+            colorObj.sat = sat;
+            colorObj.val = val;
+            colorObj.luma = 0.3 * r + 0.59 * g + 0.11 * b;
+            colorObj.red = parseInt(hex.substring(0, 2), 16);
+            colorObj.green = parseInt(hex.substring(2, 4), 16);
+            colorObj.blue = parseInt(hex.substring(4, 6), 16);
+            return colorObj;
+        };
+
+        var sortColorsByHue = function (colors) {
+            return colors.sort(function (a, b) {
+                return a.hue - b.hue;
+            });
+        };
+
+        var sortColors  = function () {
+            var colors = [];
+            angular.forEach($scope.customColors, function (color) {
+                var color = new Color(color);
+                constructColor(color);
+                colors.push(color)
+            });
+            sortColorsByHue(colors);
+            $scope.customColors = colors.map(function (color) {
+                return color.hex
+            });
+        };
+        sortColors();
+
+
 
         $scope.openReportModal = function () {
             subjectService.setSubjectToCopy(subjectService.getSubjectCopy());
