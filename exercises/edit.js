@@ -382,7 +382,7 @@ angular.module('myApp.edit', ['ngRoute'])
         };
 
         $scope.changeWebOnly = function (value) {
-            $scope.collection.webOnly=value;
+            $scope.collection.web_only=value;
             $scope.editCollectionName.value = false;
             updateCollection()
         };
