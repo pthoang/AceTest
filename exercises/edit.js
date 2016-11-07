@@ -275,7 +275,7 @@ angular.module('myApp.edit', ['ngRoute'])
                 order: orderUpdate? $scope.collection.exercises.map(function (exercise) {
                     return exercise.id
                 }) : undefined,
-                webOnly: $scope.collection.webOnly
+                web_only: $scope.collection.web_only
             };
             requestService.httpPut('/collections/' + $scope.collection.id, updateData)
                 .then(function (response) {
