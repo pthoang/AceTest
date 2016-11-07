@@ -62,7 +62,7 @@ angular.module('myApp.edit', ['ngRoute'])
                     name: '',
                     exercises: [],
                     public: true,
-                    webOnly: false
+                    web_only: false
                 };
                 collectionService.setCollection($scope.collection);
                 $scope.editCollectionName.value = true;

@@ -20,7 +20,7 @@
             <div ng-click="$event.stopPropagation()" class="col-xs-2">
                 <div style="margin-top: 10px">
                     <p>Tilgjengelighet:</p>
-                    <div ng-show="!collection.webOnly">
+                    <div ng-show="!collection.web_only">
                         <span style="margin-right: 20px">
                             <span class="fa fa-mobile" style="font-size: 30px"></span>
                             <span class="fa fa-desktop" style="font-size: 30px"></span>
@@ -29,7 +29,7 @@
                             <span class="fa fa-desktop" style="font-size: 20px"></span>
                         </span>
                     </div>
-                    <div ng-show="collection.webOnly">
+                    <div ng-show="collection.web_only">
                         <span style="margin-right: 20px; color: lightgrey; cursor: pointer" ng-click="changeWebOnly(false)">
                             <span class="fa fa-mobile" style="font-size: 20px;"></span>
                             <span class="fa fa-desktop" style="font-size: 20px;"></span>

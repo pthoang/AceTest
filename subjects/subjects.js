@@ -6,6 +6,7 @@ angular.module('myApp.subjects', ['ngRoute', 'ui.checkbox'])
     .controller('subjectsCtrl', function ($scope, $http, $cookies, $base64, $uibModal,$location, subjectService, requestService, apiUrl) {
         $scope.deleteMode = false;
         $scope.mouseOver = {};
+        $scope.delete = {};
         $scope.userName = $cookies.getObject('username');
         requestService.httpGet("/subjects")
             .then(function (response) {
@@ -23,6 +24,7 @@ angular.module('myApp.subjects', ['ngRoute', 'ui.checkbox'])
                 headers: $cookies.getObject('token')
             }).success(function (response, status) {
                 $scope.subjects.splice(index, 1);
+                delete $scope.delete[index];
                 requestService.httpGet("/subjects")
                     .then(function (response) {
                         subjectService.setUserSubjects(response.map(function (subject) {
