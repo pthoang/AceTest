@@ -230,7 +230,6 @@ angular.module('myApp.collections', ['ngRoute', 'ngjsColorPicker'])
                 templateUrl: 'reportModal.html',
                 controller: 'reportModalCtrl',
                 windowClass: 'app-modal-large',
-                backdrop: 'static',
                 resolve: {
                     reportInfo: function () {
                         return $scope.reportInfo

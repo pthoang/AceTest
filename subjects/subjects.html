@@ -21,11 +21,28 @@
             <div ng-mouseenter="mouseOver[$index] = true" ng-mouseleave="mouseOver[$index] = false; delete[$index]=false"
                  class="btn-subjects" ng-click="setTargetSubject(item)" align="left"
                  ng-style="item.color ? {'background-color': item.color}:{'background-color': 'cornflowerblue'}">
-                <div class="container-fluid">
+                <div class="col-xs-10">
                     <h2>
                         <b>{{ item.name }}</b>
                     </h2>
-                    <p style="font-size: 17px; margin-top: -2px">{{item.code}}</p>
+                </div>
+                <div class="col-xs-2" align="right">
+                    <h2>
+                        <span ng-if="item.published=='yes'" style="font-size: 20px;">
+                            <span ng-show="!item.web_only">
+                                <span class="fa fa-mobile"></span>
+                                <span class="fa fa-desktop"></span>
+                            </span>
+                            <span ng-show="item.web_only">
+                                <span class="fa fa-desktop"></span>
+                            </span>
+                        </span>
+                    </h2>
+                </div>
+                <div class="col-xs-12">
+                    <p style="font-size: 17px; margin-top: -2px">
+                        {{item.code}}
+                    </p>
                 </div>
                 <div ng-show="mouseOver[$index]" class="container-fluid">
                     <span ng-show="!delete[$index]" class="glyphicon glyphicon-trash"
