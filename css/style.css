@@ -140,6 +140,11 @@ body {
     background-color: white;
     box-shadow: 1px 3px 8px #888888;
 }
+.div-card:focus {
+    outline: none !important;
+    border: 1px solid blue;
+    box-shadow: 0 0 10px #719ECE;
+}
 .open-text-input {
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
