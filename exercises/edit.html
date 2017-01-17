@@ -41,18 +41,15 @@
                 </div>
             </div>
         </div>
-        <div>
-            <div ng-include="'exercises/editBtn.html'"></div>
-            <!--<button ng-click="saveCollection('goToSubject')" ng-disabled="saveClicked" class="btn btn-exercises">-->
-                <!--Lagre-->
-            <!--</button>-->
-        </div>
 
         <div id="editArea" style="width: 960px; margin-left: -15px" ng-click="$event.stopPropagation()">
             <div as-sortable="dragControlListeners" ng-model="collection.exercises">
                 <div class="container-fluid" as-sortable-item ng-repeat="exercise in collection.exercises track by $index"
                      ng-model="exercise" style="margin-bottom: 10px;">
-                    <div class="container-fluid div-card" as-sortable-item-handle style="cursor: default; width: 100%; position: relative"
+                    <div tabindex="0" ng-focus="focusedExercise = $index" ng-blur="focusedExercise = undefined"
+                         ng-keypress="$event.keyCode == 13 && focusedExercise!= undefined && choseActiveExercise(focusedExercise)"
+                         ng-keydown="$event.keyCode == 9 && $event.shiftKey && focusedExercise!= undefined && choseActiveExercise(undefined)"
+                         class="container-fluid div-card" as-sortable-item-handle style="cursor: default; width: 100%; position: relative"
                          ng-style="exercise.error ? {'border': '2px solid red'} : {}" ng-mouseenter="focused[$index] = true"
                          ng-mouseleave="focused[$index] = false; confirmDelete[$index] = false">
                         <div class="container-fluid" style="margin-top: 30px"></div>
@@ -104,21 +101,6 @@
 
         </div>
     </div>
-    <div ng-show="typeChoser" id="typeChoser" tabindex="0" class="container-fluid div-card" ng-keypress="choseType($event)" ng-blur="typeChoser=false"
-    style="margin-bottom: 20px">
-        <h3>Velg oppgavetype</h3>
-        <span style="font-size: 20px; margin-right: 10px">1. Multiple Choice</span>
-        <span style="font-size: 20px; margin-right: 10px">2. Phrase-Definition</span>
-        <span style="font-size: 20px; margin-right: 10px">3. True/False</span>
-        <div style="height: 10px"></div>
-    </div>
-
-    <div ng-show="collection.exercises.length > 0">
-        <div ng-include="'exercises/editBtn.html'"></div>
-        <!--<button ng-click="saveCollection('goToSubject')" ng-disabled="saveClicked" class="btn btn-exercises">-->
-            <!--Lagre-->
-        <!--</button>-->
-    </div>
 
 
     <uib-alert style="position:fixed; bottom:10px;left:10px;" class="repeat-item" ng-repeat="alert in alerts"
@@ -131,4 +113,7 @@
 
     </div>
 
+</div>
+<div style="background: rgba(255,255,255, 0.7); position: fixed; bottom: 0; width: 100%; " align="center">
+    <div ng-include="'exercises/editBtn.html'"></div>
 </div>

@@ -123,7 +123,10 @@ angular.module('myApp.collections', ['ngRoute', 'ngjsColorPicker'])
         };
 
         $scope.unFocus = function () {
-            if($scope.editSubjectName || $scope.editSubjectDescription) {
+            if(($scope.editSubjectName || $scope.editSubjectDescription) &&
+                (!angular.equals($scope.subject.name, $scope.subjectNameCopy) || !angular.equals($scope.subject.description, $scope.descriptionCopy))) {
+                console.log($scope.descriptionCopy);
+                console.log($scope.subject.description);
                 $scope.saveSubject();
             }
             $scope.editSubjectName = false;
@@ -131,6 +134,9 @@ angular.module('myApp.collections', ['ngRoute', 'ngjsColorPicker'])
         };
 
         $scope.setEditTrue = function (id) {
+            $scope.unFocus();
+            $scope.subjectNameCopy = angular.copy($scope.subject.name);
+            $scope.descriptionCopy = angular.copy($scope.subject.description);
             if(id=='subjectName') {
                 $scope.editSubjectName = true;
             }
@@ -337,21 +343,26 @@ angular.module('myApp.collections', ['ngRoute', 'ngjsColorPicker'])
                             exercise.content.wrongs.push({answer: ''})
                         }
                     }
-                    requestService.httpPut('/exercises/' + exercise.id, exercise)
-                        .then(function (response) {
-                            console.log(response);
-                            $scope.changesMade.value = true;
-                            alertify.success('Oppgaven lagret');
-                            delete exercise.error
-                        }, function (response) {
-                            console.log(response);
-                            console.log(exercise);
-                            alertify.error('En feil oppstod ved lagring av oppgaven');
-                            exercise.error = true
-                        })
+                    if(!angular.equals(exercise, $scope.exerciseCopy)){
+                        requestService.httpPut('/exercises/' + exercise.id, exercise)
+                            .then(function (response) {
+                                console.log(response);
+                                $scope.changesMade.value = true;
+                                alertify.success('Oppgaven lagret');
+                                delete exercise.error
+                            }, function (response) {
+                                console.log(response);
+                                console.log(exercise);
+                                alertify.error('En feil oppstod ved lagring av oppgaven');
+                                exercise.error = true
+                            })
+                    } else {
+                        console.log('jada')
+                    }
                 }
             }
             $scope.activeExercise = index;
+            $scope.exerciseCopy = $scope.activeExercise != undefined? angular.copy($scope.reportInfo[$scope.activeExercise].exercise):{};
         };
 
         //************************MC-specific functions***************************
@@ -438,7 +449,7 @@ angular.module('myApp.collections', ['ngRoute', 'ngjsColorPicker'])
 
         $scope.saveChanges = function () {
             console.log($scope.exercise);
-            $scope.closeActiveExercise();
+            $scope.choseActiveExercise(undefined);
             var imageUpload =[];
             if($scope.exercise.content.question.image && !$scope.exercise.content.question.image.url) {
                 var imageData = {

@@ -23,10 +23,10 @@
                           style="font-size: 25px; margin-top: 5px; cursor: pointer"></span>
                 </div>
                 <div class="col-xs-10">
-                    <textarea id="alt-{{$index}}" ng-if="alternative.correct" ng-keypress="focusNextAlternative($event, $last, $index)"
+                    <textarea id="alt-{{$index}}" ng-if="alternative.correct" ng-keypress="changeAlternativeValue($event, exercise, $index)"
                               msd-elastic class="open-text-input" style="resize: none;" rows="1" ng-model="alternative.answer" placeholder="Riktig alternativ"
                               ng-focus="showLimitAlt[$index] = true" ng-blur="showLimitAlt[$index] = false"></textarea>
-                    <textarea id="alt-{{$index}}" ng-if="!alternative.correct" ng-keypress="focusNextAlternative($event, $last, $index)"
+                    <textarea id="alt-{{$index}}" ng-if="!alternative.correct" ng-keypress="changeAlternativeValue($event, exercise, $index)"
                               msd-elastic class="open-text-input" style="resize: none;" rows="1" ng-model="alternative.answer" placeholder="Galt alternativ"
                               ng-focus="showLimitAlt[$index] = true" ng-blur="showLimitAlt[$index] = false"></textarea>
                     <div ng-show="showLimitAlt[$index] && !collection.webOnly" ng-style="alternative.answer.length > maxLengthAlternatives? {'color': 'red'}: {}" style="float: right; margin-top: -13px">
@@ -43,7 +43,9 @@
             </div>
         </div>
         <div class="container-fluid" style="width: 85%;margin-top: 10px;">
-            <a style="cursor: pointer" ng-click="addAlternative(exercise)">+ Legg til alternativ</a>
+            <a tabindex="0" style="cursor: pointer" ng-click="addAlternative(exercise)" ng-keypress="$event.keyCode==13 && addAlternative(exercise)">
+                + Legg til alternativ
+            </a>
         </div>
         <div class="col-xs-10">
         </div>

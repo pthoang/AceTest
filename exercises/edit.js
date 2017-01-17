@@ -18,8 +18,8 @@ var tf = {
 };
 
 angular.module('myApp.edit', ['ngRoute'])
-    .controller('editCtrl', function ($scope, $cookies, $window, $document, $http, $routeParams, $timeout,
-                                      $location, $q, $uibModal, $rootScope, collectionService, subjectService, requestService, focus, apiUrl,alertify) {
+    .controller('editCtrl', function ($scope, $cookies, $window, $document, $http, $routeParams, $timeout, $location, $q, $uibModal,
+                                      $rootScope, collectionService, subjectService, requestService, focus, apiUrl, alertify, hotkeys) {
         var ajv = new Ajv({removeAdditional: true});
         var validateExercise = function (schema, object) {
             return ajv.validate(schema, object);
@@ -143,13 +143,15 @@ angular.module('myApp.edit', ['ngRoute'])
             });
         };
 
-        $scope.focusNextAlternative = function (event, last, index) {
+        $scope.changeAlternativeValue = function (event, exercise, index) {
             if(event.keyCode==13 && !event.shiftKey) {
                 event.preventDefault();
-                if(last) {
-                    $scope.addAlternative()
+                if($scope.mcAlternatives[index].correct) {
+                    $scope.makeWrong(exercise, index)
+                } else {
+                    $scope.makeCorrect(exercise, index)
                 }
-                focus('alt-'+(index+1));
+                focus('alt-' + index)
             }
         };
 
@@ -191,16 +193,6 @@ angular.module('myApp.edit', ['ngRoute'])
             }
         };
 
-        var mapKeycodeType = {
-            49: 'mc',
-            50: 'pd',
-            51: 'tf'
-        };
-        $scope.choseType = function (event) {
-            if(mapKeycodeType[event.keyCode]) {
-                $scope.addExercise(mapKeycodeType[event.keyCode])
-            }
-        };
 
         var orderUpdate = false;
 
@@ -313,17 +305,19 @@ angular.module('myApp.edit', ['ngRoute'])
                         }
                     }
                     if(exercise.id) {
-                        requestService.httpPut('/exercises/' + exercise.id, exercise)
-                            .then(function (response) {
-                                console.log(response);
-                                alertify.success('Oppgaven lagret');
-                                delete exercise.error
-                            }, function (response) {
-                                console.log(response);
-                                console.log(exercise);
-                                alertify.error('En feil oppstod ved lagring av oppgaven');
-                                exercise.error = true
-                            })
+                        if(!angular.equals(exercise, $scope.exerciseCopy)) {
+                            requestService.httpPut('/exercises/' + exercise.id, exercise)
+                                .then(function (response) {
+                                    console.log(response);
+                                    alertify.success('Oppgaven lagret');
+                                    delete exercise.error
+                                }, function (response) {
+                                    console.log(response);
+                                    console.log(exercise);
+                                    alertify.error('En feil oppstod ved lagring av oppgaven');
+                                    exercise.error = true
+                                })
+                        }
                     } else {
                         requestService.httpPost('/collections/' + $scope.collection.id + '/exercises', exercise)
                             .then(function (response) {
@@ -339,9 +333,14 @@ angular.module('myApp.edit', ['ngRoute'])
 
                 }
             }
-            $scope.activeExercise = index;
+            if($scope.activeExercise != index) {
+                $scope.activeExercise = index;
+                $scope.exerciseCopy = $scope.activeExercise != undefined? angular.copy($scope.exercises[$scope.activeExercise]):{};
+                focus('activeQuestion');
+            }
             if($scope.editCollectionName.value) {
                 if($scope.collection.id == undefined) {
+                    $scope.collection.name = $scope.collection.name.length > 0 ? $scope.collection.name: "Oppgavesett uten navn";
                     var data = {
                                     name: $scope.collection.name,
                                     inOrder: $scope.collection.inOrder? true:false,
@@ -353,30 +352,26 @@ angular.module('myApp.edit', ['ngRoute'])
                             alertify.success('Navn lagret');
                             console.log(response)
                         }, function (response) {
-                            console.log(response)
+                            console.log(response);
                             alertify.error('En feil oppstod ved oppretting av oppgavesettet')
                         })
                 } else {
-                    updateCollection()
+                    if(!angular.equals($scope.collection.name, $scope.collectionNameCopy)) {
+                        updateCollection()
+                    }
                 }
                 $scope.editCollectionName.value = false;
             }
         };
 
         $scope.tabNextExercise = function () {
-            if($scope.activeExercise+1 < $scope.exercises.length) {
-                $scope.choseActiveExercise($scope.activeExercise+1);
-                focus('activeQuestion')
-            } else {
-                $scope.choseActiveExercise(undefined);
-                $scope.typeChoser = true;
-                focus('typeChoser')
-            }
+            $scope.choseActiveExercise(undefined);
         };
 
         $scope.setEditCollectionNameTrue = function () {
             $scope.choseActiveExercise(undefined);
             $scope.editCollectionName.value = true;
+            $scope.collectionNameCopy = angular.copy($scope.collection.name);
             focus('collectionName')
 
         };
@@ -413,6 +408,25 @@ angular.module('myApp.edit', ['ngRoute'])
             $location.path('/subjects/' + $routeParams.subjectId + '/collections/' + $scope.collection.id + '/add')
         };
 
+        hotkeys.bindTo($scope)
+            .add({
+                combo: '1',
+                callback: function () {
+                    $scope.addExercise('mc')
+                }
+            })
+            .add({
+                combo: '2',
+                callback: function () {
+                    $scope.addExercise('pd')
+                }
+            })
+            .add({
+                combo: '3',
+                callback: function () {
+                    $scope.addExercise('tf')
+                }
+            });
 
         $scope.dragControlListeners = {
             accept: function (sourceItemHandleScope, destSortableScope) {

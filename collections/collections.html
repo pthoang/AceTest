@@ -21,9 +21,9 @@
                  ng-style="subject.color? {'color': subject.color}:{'color': 'cornflowerblue'}">
                 <div class="row">
                     <div class="col-xs-6">
-                        <span style="cursor: pointer;"></b>Oppdateringer (0)</span>
-                        <span>/</span>
-                        <span style="cursor: pointer;" ng-click="openReportModal()">Tilbakemeldinger ({{reportInfo.length}})</span>
+                        <!--<span style="cursor: pointer;"></b>Oppdateringer (0)</span>-->
+                        <!--<span>/</span>-->
+                        <span ng-if="admin" style="cursor: pointer;" ng-click="openReportModal()">Tilbakemeldinger ({{reportInfo.length}})</span>
                     </div>
                     <div class="col-xs-4"></div>
                     <div class="col-xs-2">
