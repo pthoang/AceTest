@@ -27,8 +27,8 @@ angular.module('myApp.edit', ['ngRoute'])
 
         if (!subjectService.getSubject()) {
             window.localStorage.setItem('refreshed', true);
-            $location.path("/subjects/" + $routeParams.subjectId)
 
+            $location.path("/subjects/" + $routeParams.subjectId)
         }
 
         $scope.types = [{desc: "Phrase-Definition", type: "pd"},
@@ -40,6 +40,7 @@ angular.module('myApp.edit', ['ngRoute'])
             tf: "True/False"
         };
         $scope.defaultType = "mc";
+        $scope.exercises = [];
         $scope.files = [];
         $scope.clickedSave = false;
         $scope.extraProperty = {};
@@ -54,7 +55,6 @@ angular.module('myApp.edit', ['ngRoute'])
         //window.localStorage.setItem('refreshed', false);
 
         $scope.collection = $routeParams.collectionId == 'new' ? undefined : collectionService.getCollection();
-
 
         if (!$scope.collection || collectionService.getCollection().id != $routeParams.collectionId) {
             if ($routeParams.collectionId == 'new') {
@@ -71,13 +71,20 @@ angular.module('myApp.edit', ['ngRoute'])
                 $location.path('/subjects/' + $routeParams.subjectId)
             }
         }
-
-        $scope.exercises = $scope.collection.exercises;
-
-        if ($scope.exercises.length) {
-            var index = parseInt($scope.exercises.length) - 1;
-            $scope.defaultType = $scope.exercises[index].type;
+        if($routeParams.collectionId != "new") {
+            requestService.httpGet("/collections/" + $routeParams.collectionId + "/exercises").then(function (response) {
+                console.log(response)
+                $scope.exercises = response
+                if ($scope.exercises.length) {
+                    var index = parseInt($scope.exercises.length) - 1;
+                    $scope.defaultType = $scope.exercises[index].type;
+                }
+            });
         }
+
+
+
+
 
 
 
@@ -122,31 +129,18 @@ angular.module('myApp.edit', ['ngRoute'])
         };
         //************************MC-specific functions***************************
         $scope.addAlternative = function (exercise) {
-           $scope.mcAlternatives.push({answer: "", correct: false});
+           exercise.content.alternatives.push({text: "", correct: false});
         };
 
-        $scope.deleteAlternative = function (index) {
-            $scope.mcAlternatives.splice(index, 1)
+        $scope.deleteAlternative = function (exercise, index) {
+            exercise.content.alternatives.splice(index, 1)
         };
 
-        $scope.initAlternatives = function (exercise) {
-            $scope.mcAlternatives = [];
-            angular.forEach(exercise.content.corrects, function (correct) {
-                var correctCopy = angular.copy(correct);
-                correctCopy.correct = true;
-                $scope.mcAlternatives.push(correctCopy);
-            });
-            angular.forEach(exercise.content.wrongs, function (wrong) {
-                var wrongCopy = angular.copy(wrong);
-                wrongCopy.correct = false;
-                $scope.mcAlternatives.push(wrongCopy);
-            });
-        };
 
         $scope.changeAlternativeValue = function (event, exercise, index) {
             if(event.keyCode==13 && !event.shiftKey) {
                 event.preventDefault();
-                if($scope.mcAlternatives[index].correct) {
+                if(exercise.content.alternatives[index].correct) {
                     $scope.makeWrong(exercise, index)
                 } else {
                     $scope.makeCorrect(exercise, index)
@@ -157,12 +151,12 @@ angular.module('myApp.edit', ['ngRoute'])
 
         $scope.makeWrong = function (exercise, index) {
             if(index!=0) {
-                $scope.mcAlternatives[index].correct = false;
+                exercise.content.alternatives[index].correct = false;
             };
         };
 
         $scope.makeCorrect = function (exercise, index) {
-            $scope.mcAlternatives[index].correct = true;
+            exercise.content.alternatives[index].correct = true;
         };
         //******************************************************************************
 
@@ -170,28 +164,24 @@ angular.module('myApp.edit', ['ngRoute'])
         $scope.changeAnswer = function (event, exercise) {
             if(event.keyCode==13 && !event.shiftKey) {
                 event.preventDefault();
-                exercise.content.correct.answer = !exercise.content.correct.answer
+                exercise.content.correct = !exercise.content.correct
             }
         };
 
 
-        $scope.changeDefault = function (exercise, index) {
-            $scope.defaultType = exercise.type;
-            if(exercise.type == 'mc') {
-                if(!exercise.content.corrects) {
-                    exercise.content.corrects = [{answer: ""}];
-                }
-                if(!exercise.content.wrongs) {
-                    exercise.content.wrongs = [{answer: ""}];
-                }
-            } else if(exercise.type == 'pd') {
-                if(!exercise.content.tags) {
-                    exercise.content.tags = [{text: $scope.collection.name.replace(/[\s]/g, '-')}]
-                }
-            } else if(exercise.type =='tf') {
-                exercise.content.correct = {answer: true};
-            }
-        };
+        // $scope.changeDefault = function (exercise, index) {
+        //     $scope.defaultType = exercise.type;
+        //     if(exercise.type == 'mc') {
+        //         if(!exercise.content.alternatives) {
+        //             exercise.content.alternatives = [{text: "", correct: true }];
+        //         }
+        //         if(!exercise.content.wrongs) {
+        //             exercise.content.wrongs = [{answer: ""}];
+        //         }
+        //     } else if(exercise.type =='tf') {
+        //         exercise.content.correct = {answer: true};
+        //     }
+        // };
 
 
         var orderUpdate = false;
@@ -199,23 +189,24 @@ angular.module('myApp.edit', ['ngRoute'])
         $scope.addExercise = function (type) {
             orderUpdate = true;
             var exercise = {
-                type: type,
-                content: {question: {}}
+                content: {
+                    type: type,
+                    question: {}
+                }
             };
-            if(exercise.type == 'mc') {
-                exercise.content.corrects = [{answer: ""}];
-                exercise.content.wrongs = [{answer: ""}];
-            } else if (exercise.type == 'pd') {
-                exercise.content.correct = {};
-                exercise.content.tags = [{text: $scope.collection.name.replace(/[\s]/g, '-')}]
-            } else if(exercise.type == 'tf') {
-                exercise.content.correct = {answer: true};
+            if(exercise.content.type == 'mc') {
+                exercise.content.alternatives = [{text: "", correct: true}];
+                for(var i=0; i < 2; i++) {
+                    exercise.content.alternatives.push({text: "", correct: false})
+                }
+            } else if(exercise.content.type == 'tf') {
+                exercise.content.correct = true;
             }
-            $scope.collection.exercises.push(exercise);
+            $scope.exercises.push(exercise);
             $timeout(function () {
                 window.scrollTo(0, document.body.scrollHeight);
             }, 0);
-            $scope.choseActiveExercise($scope.collection.exercises.length - 1);
+            $scope.choseActiveExercise($scope.exercises.length - 1);
             focus('activeQuestion');
             $scope.defaultType = type
         };
@@ -249,7 +240,7 @@ angular.module('myApp.edit', ['ngRoute'])
         var filterAlternativeArray = function (array) {
             var alternativeRemoveList = [];
             for(var i=0; i < array.length; i++) {
-                if(!array[i].answer.length > 0) {
+                if(!array[i].text.length > 0) {
                     alternativeRemoveList.push(i)
                 }
             }
@@ -263,8 +254,7 @@ angular.module('myApp.edit', ['ngRoute'])
         var updateCollection = function () {
             var updateData = {
                 name: $scope.collection.name,
-                inOrder: $scope.collection.inOrder,
-                order: orderUpdate? $scope.collection.exercises.map(function (exercise) {
+                order: orderUpdate? $scope.exercises.map(function (exercise) {
                     return exercise.id
                 }) : undefined,
                 web_only: $scope.collection.web_only
@@ -286,27 +276,17 @@ angular.module('myApp.edit', ['ngRoute'])
                 if($scope.activeExercise != undefined) {
                     var exercise = $scope.exercises[$scope.activeExercise];
                     var activeIndex = $scope.activeExercise;
-                    if(exercise.type == 'mc') {
-                        filterAlternativeArray($scope.mcAlternatives);
-                        exercise.content.corrects = [];
-                        exercise.content.wrongs = [];
-                        angular.forEach($scope.mcAlternatives, function (alternative) {
-                            if(alternative.correct) {
-                                exercise.content.corrects.push({answer: alternative.answer});
-                            } else {
-                                exercise.content.wrongs.push({answer: alternative.answer})
-                            }
-                        });
-                        if(exercise.content.corrects.length == 0) {
-                            exercise.content.corrects.push({answer: ''})
+                    if(exercise.content.type == 'mc') {
+                        filterAlternativeArray(exercise.content.alternatives);
+                        if(exercise.content.alternatives.length == 0) {
+                            exercise.content.alternatives.push({text: 'Riktig', correct: true});
+                            exercise.content.alternatives.push({text: "Galt", correct: false})
                         }
-                        if($scope.exercises[$scope.activeExercise].content.wrongs.length == 0) {
-                            exercise.content.wrongs.push({answer: ''})
-                        }
+
                     }
                     if(exercise.id) {
                         if(!angular.equals(exercise, $scope.exerciseCopy)) {
-                            requestService.httpPut('/exercises/' + exercise.id, exercise)
+                            requestService.httpPut('/exercises/' + exercise.id, exercise.content)
                                 .then(function (response) {
                                     console.log(response);
                                     alertify.success('Oppgaven lagret');
@@ -319,7 +299,7 @@ angular.module('myApp.edit', ['ngRoute'])
                                 })
                         }
                     } else {
-                        requestService.httpPost('/collections/' + $scope.collection.id + '/exercises', exercise)
+                        requestService.httpPost('/collections/' + $scope.collection.id + '/exercises', exercise.content)
                             .then(function (response) {
                                 exercise.id = response.insertedId;
                                 alertify.success('Oppgaven lagret');
@@ -343,7 +323,6 @@ angular.module('myApp.edit', ['ngRoute'])
                     $scope.collection.name = $scope.collection.name.length > 0 ? $scope.collection.name: "Oppgavesett uten navn";
                     var data = {
                                     name: $scope.collection.name,
-                                    inOrder: $scope.collection.inOrder? true:false,
                                     public: true
                                 };
                     requestService.httpPost('/subjects/'+$routeParams.subjectId + "/collections", data)
@@ -398,7 +377,7 @@ angular.module('myApp.edit', ['ngRoute'])
         };
 
         $scope.removeImage = function (index) {
-            delete $scope.collection.exercises[index].content.question.image;
+            delete $scope.exercises[index].content.question.image;
             if(document.getElementById(index)) {
                 document.getElementById(index).value = ''
             }
@@ -417,12 +396,6 @@ angular.module('myApp.edit', ['ngRoute'])
             })
             .add({
                 combo: '2',
-                callback: function () {
-                    $scope.addExercise('pd')
-                }
-            })
-            .add({
-                combo: '3',
                 callback: function () {
                     $scope.addExercise('tf')
                 }

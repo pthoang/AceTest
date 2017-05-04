@@ -19,10 +19,10 @@
         </div>
         <div class="col-xs-11">
             <div class="btn-group" style="margin-top:4px">
-                <label class="btn btn-default" ng-model="exercise.content.correct.answer" uib-btn-radio="true" style="margin-top: 2px;" >
+                <label class="btn btn-default" ng-model="exercise.content.correct" uib-btn-radio="true" style="margin-top: 2px;" >
                     <span class="glyphicon glyphicon-ok-sign" style="font-size: 25px;"></span>
                 </label>
-                <label class="btn btn-default" ng-model="exercise.content.correct.answer" uib-btn-radio="false" style="margin-top: 2px;">
+                <label class="btn btn-default" ng-model="exercise.content.correct" uib-btn-radio="false" style="margin-top: 2px;">
                     <span class="glyphicon glyphicon-remove-sign" style="font-size: 25px;"></span>
                 </label>
             </div>
@@ -32,10 +32,10 @@
 
 <div class="container-fluid" ng-if="exerciseNumber != activeExercise">
     <div class="row">
-        <div ng-show="exercise.content.correct.answer == true" class="col-xs-1">
+        <div ng-show="exercise.content.correct == true" class="col-xs-1">
             <span class="glyphicon glyphicon-ok" style="font-size: 20px; margin-top: 7px"></span>
         </div>
-        <div ng-show="exercise.content.correct.answer == false" class="col-xs-1">
+        <div ng-show="exercise.content.correct == false" class="col-xs-1">
             <span class="glyphicon glyphicon-remove" style="font-size: 20px; margin-top: 7px"></span>
         </div>
         <div class="col-xs-11">

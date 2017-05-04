@@ -22,7 +22,7 @@ angular.module('myApp.add', ['ngRoute'])
                             name: subject.name,
                             published: 'no',
                             collections: subject.collections,
-                            description: "Laget av ekte tælling " + $cookies.getObject('username')
+                            description: "Beskrivelse"
                         }
                     },
                     headers: $cookies.getObject('token')

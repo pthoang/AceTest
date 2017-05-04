@@ -4,11 +4,11 @@
         ng-style="subject.color? {'color': subject.color}:{'color':'cornflowerblue'}">Gå tilbake til {{subject.name}}</h4>
         <div ng-click="$event.stopPropagation(); setEditCollectionNameTrue()" class="container-fluid div-card header-exercises" style="width: 100%; margin-bottom: 20px;"
         ng-style="subject.color ? {'color': subject.color, 'border': '3px solid ' + subject.color}:{}">
-            <div ng-if="!editCollectionName.value && !collection.name.length==0" class="col-xs-10"
+            <div ng-if="!editCollectionName.value && !collection.name.length==0" class="container-fluid"
                  style="margin-top: 15px; margin-bottom: 15px">
                 <h2 style="font-size: 25px; margin-top: 10px"><b>{{collection.name}}</b></h2>
             </div>
-            <div ng-if="editCollectionName.value || collection.name.length==0" class="col-xs-10" ng-click="$event.stopPropagation()"
+            <div ng-if="editCollectionName.value || collection.name.length==0" class="container-fluid" ng-click="$event.stopPropagation()"
                  style="margin-top: 10px; margin-bottom: 10px; margin-left: -7px">
                 <textarea id="collectionName" ng-keypress="$event.keyCode==13 && choseActiveExercise(undefined)"
                           msd-elastic class="open-text-input" ng-model="collection.name"
@@ -17,39 +17,17 @@
                 </textarea>
                 <span style="float: right; margin-top: -13px">{{90-collection.name.length}}</span>
             </div>
-            <div ng-click="$event.stopPropagation()" class="col-xs-2">
-                <div style="margin-top: 10px">
-                    <p>Tilgjengelighet:</p>
-                    <div ng-show="!collection.web_only">
-                        <span style="margin-right: 20px">
-                            <span class="fa fa-mobile" style="font-size: 30px"></span>
-                            <span class="fa fa-desktop" style="font-size: 30px"></span>
-                        </span>
-                        <span style="color: lightgrey; cursor: pointer" ng-click="changeWebOnly(true)">
-                            <span class="fa fa-desktop" style="font-size: 20px"></span>
-                        </span>
-                    </div>
-                    <div ng-show="collection.web_only">
-                        <span style="margin-right: 20px; color: lightgrey; cursor: pointer" ng-click="changeWebOnly(false)">
-                            <span class="fa fa-mobile" style="font-size: 20px;"></span>
-                            <span class="fa fa-desktop" style="font-size: 20px;"></span>
-                        </span>
-                        <span>
-                            <span class="fa fa-desktop" style="font-size: 30px"></span>
-                        </span>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div id="editArea" style="width: 960px; margin-left: -15px" ng-click="$event.stopPropagation()">
-            <div as-sortable="dragControlListeners" ng-model="collection.exercises">
-                <div class="container-fluid" as-sortable-item ng-repeat="exercise in collection.exercises track by $index"
+            <div as-sortable="dragControlListeners" ng-model="exercises">
+                <div class="container-fluid" as-sortable-item ng-repeat="exercise in exercises track by $index"
                      ng-model="exercise" style="margin-bottom: 10px;">
                     <div tabindex="0" ng-focus="focusedExercise = $index" ng-blur="focusedExercise = undefined"
                          ng-keypress="$event.keyCode == 13 && focusedExercise!= undefined && choseActiveExercise(focusedExercise)"
                          ng-keydown="$event.keyCode == 9 && $event.shiftKey && focusedExercise!= undefined && choseActiveExercise(undefined)"
-                         class="container-fluid div-card" as-sortable-item-handle style="cursor: default; width: 100%; position: relative"
+                         class="container-fluid div-card" as-sortable-item-handle
+                         style="cursor: default; width: 100%; position: relative"
                          ng-style="exercise.error ? {'border': '2px solid red'} : {}" ng-mouseenter="focused[$index] = true"
                          ng-mouseleave="focused[$index] = false; confirmDelete[$index] = false">
                         <div class="container-fluid" style="margin-top: 30px"></div>
@@ -59,27 +37,16 @@
                                     <span class="glyphicon glyphicon-exclamation-sign"></span>
                                 </div>
 
-                                <div no-drag ng-click="choseActiveExercise($index)" class="container-fluid">
-                                    <!--<div ng-if="$index == activeExercise" class="container-fluid" style="margin-bottom: 10px">-->
-                                        <!--<div class="row">-->
-                                            <!--<div class="col-lg-10">-->
-                                                <!--<select id="typeBox" ng-change="changeDefault(exercise,$index)"-->
-                                                        <!--ng-model="exercise.type"-->
-                                                        <!--align="left" style="margin-top:10px">-->
-                                                    <!--<option ng-repeat="x in types" value="{{x.type}}">{{x.desc}}</option>-->
-                                                <!--</select>-->
-                                            <!--</div>-->
-                                        <!--</div>-->
-                                    <!--</div>-->
+                                <div no-drag style="min-height: 50px" ng-click="choseActiveExercise($index)" class="container-fluid">
                                     <div class="container-fluid" style="margin-top: -20px">
-                                        <p style="color: lightgrey;">{{typeDesc[exercise.type]}}</p>
+                                        <p style="color: lightgrey;">{{typeDesc[exercise.content.type]}}</p>
                                     </div>
                                     <div onload="exerciseNumber = $index" ng-include="'exercises/imageview.html'"></div>
-                                    <div ng-if="exercise.type == 'pd'" ng-include="'exercises/pd.html'"
+                                    <div ng-if="exercise.content.type == 'pd'" ng-include="'exercises/pd.html'"
                                          onload="exerciseNumber = $index"></div>
-                                    <div ng-if="exercise.type == 'mc'" ng-include="'exercises/mc.html'"
+                                    <div ng-if="exercise.content.type == 'mc'" ng-include="'exercises/mc.html'"
                                          onload="exerciseNumber = $index"></div>
-                                    <div ng-if="exercise.type == 'tf'" ng-include="'exercises/tf.html'"
+                                    <div ng-if="exercise.content.type == 'tf'" ng-include="'exercises/tf.html'"
                                          onload="exerciseNumber = $index"></div>
                                     <div onload="exerciseNumber = $index" ng-include="'exercises/extrapropertyview.html'"></div>
                                 </div>
@@ -94,7 +61,7 @@
 
                             </div>
                         </div>
-                        <span ng-show="activeExercise==undefined" class="glyphicon glyphicon-menu-hamburger" style="font-size: 25px; cursor: all-scroll;position: absolute; top: 46%; right: 3%"></span>
+                        <!--<span ng-show="activeExercise==undefined" class="glyphicon glyphicon-menu-hamburger" style="font-size: 25px; cursor: all-scroll;position: absolute; top: 46%; right: 3%"></span>-->
                 </div>
 
             </div>

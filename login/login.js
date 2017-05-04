@@ -8,20 +8,26 @@ angular.module('myApp.login', ['ngRoute', 'base64'])
         };
 
         $scope.authenticate =function () {
-            $http({
-                url: apiUrl + '/users/authentication',
-                method: "POST",
-                data: {
-                    username: $scope.username,
-                    password: $scope.password
+            // $http({
+            //     url: apiUrl + "/subjects",
+            //     method: "GET",
+            //     headers: {
+            //         // 'x-access-token': $scope.password
+            //     },
+            //     data: {
+            //     }
+            //
+            // })
+            $http.get(apiUrl + "/subjects", {
+                headers: {
+                    'x-access-token': $scope.password,
                 }
-
-            }).success(function (response) {
+            })
+                .success(function (response) {
                 $cookies.putObject('token', {
-                    'x-access-token': response.token
+                    'x-access-token': $scope.password
                 });
-                $cookies.putObject('admin', response.admin);
-                $cookies.putObject('username', $scope.username);
+                $cookies.putObject('admin', true);
                 Auth.setToken($cookies.getObject('token'));
                 $location.path('/subjects')
 

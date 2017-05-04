@@ -7,7 +7,6 @@ angular.module('myApp.subjects', ['ngRoute', 'ui.checkbox'])
         $scope.deleteMode = false;
         $scope.mouseOver = {};
         $scope.delete = {};
-        $scope.userName = $cookies.getObject('username');
         requestService.httpGet("/subjects")
             .then(function (response) {
                 console.log(response);
@@ -106,7 +105,7 @@ angular.module('myApp.subjects', ['ngRoute', 'ui.checkbox'])
                     code: $scope.newSubjectCode.toUpperCase(),
                     name: $scope.newSubjectName,
                     published: 'no',
-                    description: "Laget av " + $cookies.getObject('username')
+                    description: "Beskrivelse..."
                 },
                 headers: $cookies.getObject('token')
 

@@ -15,8 +15,8 @@ angular.module('myApp.collections', ['ngRoute', 'ngjsColorPicker'])
             size: 30
         };
 
-        var initCollections = function (subject) {
-            $scope.collections = subject.collections;
+        var initCollections = function (collections) {
+            $scope.collections = collections;
         };
         var initReports = function (reportInfo) {
             $scope.reportInfo = reportInfo;
@@ -28,9 +28,13 @@ angular.module('myApp.collections', ['ngRoute', 'ngjsColorPicker'])
                     $scope.nameCopy = $scope.subject.name;
                     $scope.descriptionCopy = $scope.subject.description;
                     subjectService.setSubject($scope.subject);
-                    initCollections(response);
                     console.log(response);
+
+                    requestService.httpGet("/subjects/" + $routeParams.subjectId + "/collections").then(function (response) {
+                        initCollections(response);
+                    });
                     requestService.httpGet('/subjects/' + $routeParams.subjectId + '/reports').then(function (response) {
+                        console.log(response)
                         initReports(response)
                     })
                 });
@@ -38,23 +42,24 @@ angular.module('myApp.collections', ['ngRoute', 'ngjsColorPicker'])
         refresh();
 
         $scope.setTargetCollection = function (index) {
-            var targetId = index=='new'? 'new':$scope.subject.collections[index].id;
+            var targetId = index=='new'? 'new':$scope.collections[index].id;
             subjectService.setSubjectToCopy(subjectService.getSubjectCopy());
             $scope.subject = subjectService.getSubject();
-            var collectionIdList = $scope.subject.collections.map(function (collection) {
+            var collectionIdList = $scope.collections.map(function (collection) {
                 return collection.id
             });
             if(index != "new") {
-                $scope.targetCollection = $scope.subject.collections[collectionIdList.indexOf(targetId)].id;
-                collectionService.setCollection($scope.subject.collections[collectionIdList.indexOf(targetId)])
+                $scope.targetCollection = $scope.collections[collectionIdList.indexOf(targetId)].id;
+                console.log($scope.collections[collectionIdList.indexOf(targetId)])
+                collectionService.setCollection($scope.collections[collectionIdList.indexOf(targetId)])
             }
             $location.path("subjects/" + $scope.subject.id + "/collections/" + targetId)
 
         };
 
         $scope.deleteCollection = function (coll, index) {
-            if($scope.confirmDelete[$scope.subject.collections[index].id]) {
-                requestService.httpDelete('/collections/' + $scope.subject.collections[index].id)
+            if($scope.confirmDelete[$scope.collections[index].id]) {
+                requestService.httpDelete('/collections/' + $scope.collections[index].id)
                     .then(function (response) {
                         refresh();
                         alertify.success('Oppgavesett slettet')
@@ -62,7 +67,7 @@ angular.module('myApp.collections', ['ngRoute', 'ngjsColorPicker'])
                          alertify.success('En feil oppstod under slettingen')
                     })
             } else {
-                $scope.confirmDelete[$scope.subject.collections[index].id] = true;
+                $scope.confirmDelete[$scope.collections[index].id] = true;
             }
         };
 
@@ -123,25 +128,29 @@ angular.module('myApp.collections', ['ngRoute', 'ngjsColorPicker'])
         };
 
         $scope.unFocus = function () {
-            if(($scope.editSubjectName || $scope.editSubjectDescription) &&
-                (!angular.equals($scope.subject.name, $scope.subjectNameCopy) || !angular.equals($scope.subject.description, $scope.descriptionCopy))) {
-                console.log($scope.descriptionCopy);
-                console.log($scope.subject.description);
+            if(($scope.editSubjectName || $scope.editSubjectDescription || $scope.editSubjectCode) &&
+                (!angular.equals($scope.subject.name, $scope.subjectNameCopy) ||
+                !angular.equals($scope.subject.description, $scope.descriptionCopy) ||
+                !angular.equals($scope.subject.code, $scope.codeCopy))) {
+
                 $scope.saveSubject();
             }
             $scope.editSubjectName = false;
             $scope.editSubjectDescription = false;
+            $scope.editSubjectCode = false;
         };
 
         $scope.setEditTrue = function (id) {
             $scope.unFocus();
             $scope.subjectNameCopy = angular.copy($scope.subject.name);
-            $scope.descriptionCopy = angular.copy($scope.subject.description);
+            $scope.descriptionCopy = angular.copy($scope.subject.description)
+            $scope.codeCopy = angular.copy($scope.subject.code)
             if(id=='subjectName') {
                 $scope.editSubjectName = true;
-            }
-            else {
+            } else if(id=='subjectDescription'){
                 $scope.editSubjectDescription = true;
+            } else if(id =='subjectCode') {
+                $scope.editSubjectCode = true;
             }
             focus(id)
         };
@@ -227,7 +236,7 @@ angular.module('myApp.collections', ['ngRoute', 'ngjsColorPicker'])
         $scope.openReportModal = function () {
             subjectService.setSubjectToCopy(subjectService.getSubjectCopy());
             $scope.subject = subjectService.getSubject();
-            initCollections($scope.subject);
+            initCollections($scope.collections);
             $scope.changesMade = {};
             $scope.changesMade.value = false;
             console.log($scope.reportInfo)
@@ -323,28 +332,17 @@ angular.module('myApp.collections', ['ngRoute', 'ngjsColorPicker'])
                 $scope.extraProperty = {};
                 $scope.limitReports = 3;
                 if($scope.activeExercise != undefined) {
-                    var exercise = $scope.reportInfo[$scope.activeExercise].exercise;
+                    var exercise = $scope.reportInfo[$scope.activeExercise];
                     var activeIndex = $scope.activeExercise;
                     if(exercise.type == 'mc') {
-                        filterAlternativeArray($scope.mcAlternatives);
-                        exercise.content.corrects = [];
-                        exercise.content.wrongs = [];
-                        angular.forEach($scope.mcAlternatives, function (alternative) {
-                            if(alternative.correct) {
-                                exercise.content.corrects.push({answer: alternative.answer});
-                            } else {
-                                exercise.content.wrongs.push({answer: alternative.answer})
-                            }
-                        });
-                        if(exercise.content.corrects.length == 0) {
-                            exercise.content.corrects.push({answer: ''})
-                        }
-                        if($scope.reportInfo[$scope.activeExercise].exercise.content.wrongs.length == 0) {
-                            exercise.content.wrongs.push({answer: ''})
+                        filterAlternativeArray(exercise.content.alternatives);
+                        if(exercise.content.alternatives.length == 0) {
+                            exercise.content.alternatives.push({text: 'Riktig', correct: true});
+                            exercise.content.alternatives.push({text: "Galt", correct: false})
                         }
                     }
                     if(!angular.equals(exercise, $scope.exerciseCopy)){
-                        requestService.httpPut('/exercises/' + exercise.id, exercise)
+                        requestService.httpPut('/exercises/' + exercise.id, exercise.content)
                             .then(function (response) {
                                 console.log(response);
                                 $scope.changesMade.value = true;
@@ -362,7 +360,7 @@ angular.module('myApp.collections', ['ngRoute', 'ngjsColorPicker'])
                 }
             }
             $scope.activeExercise = index;
-            $scope.exerciseCopy = $scope.activeExercise != undefined? angular.copy($scope.reportInfo[$scope.activeExercise].exercise):{};
+            $scope.exerciseCopy = $scope.activeExercise != undefined? angular.copy($scope.reportInfo[$scope.activeExercise]):{};
         };
 
         //************************MC-specific functions***************************

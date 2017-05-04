@@ -32,10 +32,10 @@ angular.module('myApp', [
                 templateUrl: "login/login.html",
                 controller: "loginCtrl"
             })
-            .when("/register", {
-                templateUrl: "login/register.html",
-                controller: "registerCtrl"
-            })
+            // .when("/register", {
+            //     templateUrl: "login/register.html",
+            //     controller: "registerCtrl"
+            // })
             .when("/subjects", {
                 templateUrl: "subjects/subjects.html",
                 controller: "subjectsCtrl"
@@ -105,8 +105,8 @@ angular.module('myApp', [
     })
 
     .constant("apiUrl", "https://acepi-test2.herokuapp.com")
-    //.constant("apiUrl", "http://10.22.2.230:3000")
-    //.constant("apiUrl", "https://acepi.herokuapp.com/subjects")
+    // .constant("apiUrl", "http://10.22.17.78:3000")
+    // .constant("apiUrl", "https://acepi.herokuapp.com/subjects")
     .factory('focus', function ($timeout, $window) {
         return function (id) {
             {

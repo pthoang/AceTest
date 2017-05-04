@@ -1,4 +1,4 @@
-<div class="container-fluid" ng-if="exerciseNumber == activeExercise" ng-init="initAlternatives(exercise)">
+<div class="container-fluid" ng-if="exerciseNumber == activeExercise">
     <div class="row" style="margin-bottom: 30px">
         <div class="col-xs-1" align="center">
             <span class="glyphicon glyphicon-question-sign" style="font-size: 25px; margin-top: 5px"></span>
@@ -14,7 +14,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="container-fluid" ng-repeat="alternative in mcAlternatives track by $index" style="margin-bottom:7px;">
+        <div class="container-fluid" ng-repeat="alternative in exercise.content.alternatives track by $index" style="margin-bottom:7px;">
             <div class="row" ng-mouseenter="hoverAlternative[$index]=true" ng-mouseleave="hoverAlternative[$index]=false">
                 <div class="col-xs-1" align="center">
                     <span ng-if="alternative.correct" ng-click="makeWrong(exercise, $index)" class="glyphicon glyphicon-ok-sign"
@@ -24,19 +24,19 @@
                 </div>
                 <div class="col-xs-10">
                     <textarea id="alt-{{$index}}" ng-if="alternative.correct" ng-keypress="changeAlternativeValue($event, exercise, $index)"
-                              msd-elastic class="open-text-input" style="resize: none;" rows="1" ng-model="alternative.answer" placeholder="Riktig alternativ"
+                              msd-elastic class="open-text-input" style="resize: none;" rows="1" ng-model="alternative.text" placeholder="Riktig alternativ"
                               ng-focus="showLimitAlt[$index] = true" ng-blur="showLimitAlt[$index] = false"></textarea>
                     <textarea id="alt-{{$index}}" ng-if="!alternative.correct" ng-keypress="changeAlternativeValue($event, exercise, $index)"
-                              msd-elastic class="open-text-input" style="resize: none;" rows="1" ng-model="alternative.answer" placeholder="Galt alternativ"
+                              msd-elastic class="open-text-input" style="resize: none;" rows="1" ng-model="alternative.text" placeholder="Galt alternativ"
                               ng-focus="showLimitAlt[$index] = true" ng-blur="showLimitAlt[$index] = false"></textarea>
-                    <div ng-show="showLimitAlt[$index] && !collection.webOnly" ng-style="alternative.answer.length > maxLengthAlternatives? {'color': 'red'}: {}" style="float: right; margin-top: -13px">
-                        <span>{{alternative.answer.length}}/{{maxLengthAlternatives}}</span>
-                        <span ng-show="alternative.answer.length > maxLengthAlternatives">: Denne teksten kan være for lang for å vises riktig i mobil-appene</span>
+                    <div ng-show="showLimitAlt[$index] && !collection.webOnly" ng-style="alternative.text.length > maxLengthAlternatives? {'color': 'red'}: {}" style="float: right; margin-top: -13px">
+                        <span>{{alternative.text.length}}/{{maxLengthAlternatives}}</span>
+                        <span ng-show="alternative.text.length > maxLengthAlternatives">: Denne teksten kan være for lang for å vises riktig i mobil-appene</span>
                     </div>
 
                 </div>
                 <div class="col-xs-1" ng-hide="$first">
-                    <span ng-show="hoverAlternative[$index]" ng-click="deleteAlternative($index)"
+                    <span ng-show="hoverAlternative[$index]" ng-click="deleteAlternative(exercise, $index)"
                           class="glyphicon glyphicon-remove"
                           style="font-size: 10px;cursor: pointer;"></span>
                 </div>
@@ -60,13 +60,14 @@
         </div>
     </div>
     <div class="row">
-        <div ng-repeat="alternative in exercise.content.corrects track by $index" style="margin-bottom: 7px">
+        <div ng-repeat="alternative in exercise.content.alternatives track by $index" style="margin-bottom: 7px">
             <div class="col-xs-1">
-                <span class="glyphicon glyphicon-ok" style="font-size: 15px;">
+                <span ng-class="alternative.correct ? 'glyphicon glyphicon-ok': 'glyphicon glyphicon-remove'"
+                style="font-size: 15px;">
                 </span>
             </div>
             <div class="col-xs-11">
-                <h5 class="pre-wrap-text" style="margin-top: 0; font-size: 15px">{{alternative.answer}}</h5>
+                <h5 class="pre-wrap-text" style="margin-top: 0; font-size: 15px">{{alternative.text}}</h5>
             </div>
         </div>
     </div>
@@ -77,7 +78,7 @@
                 </span>
             </div>
             <div class="col-xs-11">
-                <h5 class="pre-wrap-text" style="margin-top: 0; font-size: 15px">{{alternative.answer}}</h5>
+                <h5 class="pre-wrap-text" style="margin-top: 0; font-size: 15px">{{alternative.text}}</h5>
             </div>
         </div>
     </div>

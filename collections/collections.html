@@ -7,13 +7,19 @@
                     style="margin-top: 20px; font-size: 40px; width: 70%;"><b>
                     {{subject.name}}
                 </b></h1>
-                <textarea id="subjectName" ng-keypress="$event.keyCode==13 && unFocus()" ng-if="editSubjectName || subject.name.length==0" msd-elastic ng-model="subject.name"
-                    rows = 1 class="open-text-input" placeholder="Navn på faget"
+                <textarea id="subjectName" ng-keypress="$event.keyCode==13 && unFocus()"
+                          ng-if="editSubjectName || subject.name.length==0" msd-elastic ng-model="subject.name"
+                    rows=1 class="open-text-input" placeholder="Navn på faget"
                     style="font-size: 40px; font-weight: bold;width: 70%; margin-top: 7px; margin-left: -7px">
                 </textarea>
             </div>
-            <div class="container-fluid" style="width: 95%">
-                <p style="margin-bottom: 20px; font-size: 15px">({{subject.code}})</p>
+            <div ng-click="$event.stopPropagation(); setEditTrue('subjectCode')" class="container-fluid" style="width: 95%">
+                <p ng-if="!editSubjectCode && !subject.name.length==0" style="margin-bottom: 20px; font-size: 15px">({{subject.code}})</p>
+                <textarea id="subjectCode" ng-keypress="$event.keyCode==13 && unFocus()"
+                          ng-if="editSubjectCode || subject.code.length==0" msd-elastic ng-model="subject.code"
+                rows=1 class="open-text-input" placeholder="Kode"
+                    style="font-size: 15px;width: 200px; margin-top: -7px; margin-left: -7px; margin-bottom: 15px">
+                </textarea>
             </div>
         </div>
         <div style="margin-top: 20px">
@@ -21,17 +27,15 @@
                  ng-style="subject.color? {'color': subject.color}:{'color': 'cornflowerblue'}">
                 <div class="row">
                     <div class="col-xs-6">
-                        <!--<span style="cursor: pointer;"></b>Oppdateringer (0)</span>-->
-                        <!--<span>/</span>-->
                         <span ng-if="admin" style="cursor: pointer;" ng-click="openReportModal()">Tilbakemeldinger ({{reportInfo.length}})</span>
                     </div>
-                    <div class="col-xs-4"></div>
-                    <div class="col-xs-2">
-                        <span style="cursor: pointer;" uib-popover-template="'colorPickerPopoverTemplate.html'"
-                              popover-trigger="outsideClick" popover-is-open="colorPopover" type="button">
-                            Endre farge
-                        </span>
-                    </div>
+                    <!--<div class="col-xs-4"></div>-->
+                    <!--<div class="col-xs-2">-->
+                        <!--<span style="cursor: pointer;" uib-popover-template="'colorPickerPopoverTemplate.html'"-->
+                              <!--popover-trigger="outsideClick" popover-is-open="colorPopover" type="button">-->
+                            <!--Endre farge-->
+                        <!--</span>-->
+                    <!--</div>-->
                 </div>
             </div>
             <div ng-click="$event.stopPropagation(); setEditTrue('subjectDescription')" class="container-fluid" style="width:95%;">
@@ -74,16 +78,16 @@
                 <h3><b>Oppgavesett</b></h3>
             </div>
             <form style="position: relative; top: -55px; left: 585px; width: 400px;">
-                <label class="btn btn-collections" ng-click="setTargetCollection('new')" style="width:45%;"
+                <label class="btn btn-collections" ng-click="setTargetCollection('new')" style="width:90%;"
                        ng-style="subject.color? {'background-color': subject.color}:{}">
                     <span class="glyphicon glyphicon-plus-sign" style="margin-top: 2px"></span>
                     <span>Nytt oppgavesett</span>
                 </label>
-                <label class="btn btn-collections" ng-click="goTo('subjects/'+subject.id+'/add')" style="width:45%;"
-                       ng-style="subject.color? {'background-color': subject.color}:{}">
-                    <span class="glyphicon glyphicon-circle-arrow-down" style="margin-top: 2px"></span>
-                    Hent oppgavesett
-                </label>
+                <!--<label class="btn btn-collections" ng-click="goTo('subjects/'+subject.id+'/add')" style="width:45%;"-->
+                       <!--ng-style="subject.color? {'background-color': subject.color}:{}">-->
+                    <!--<span class="glyphicon glyphicon-circle-arrow-down" style="margin-top: 2px"></span>-->
+                    <!--Hent oppgavesett-->
+                <!--</label>-->
             </form>
         </div>
         <div class="container-fluid">
@@ -102,7 +106,7 @@
                             </h4>
                         </div>
                         <div ng-click="setTargetCollection($index)" class="col-xs-2" align="right" ng-show="!confirmDelete[collection.id]" style="cursor: pointer">
-                            <h4>{{collection.exercises.length}} <img src="img/definition-icon.png" style="width: 20px"></h4>
+                            <h4>{{collection.n_exercises}} <img src="img/definition-icon.png" style="width: 20px"></h4>
                         </div>
                         <div class="col-xs-9" ng-show="confirmDelete[collection.id]">
                             <h4 ng-click="undoDeleteCollection(collection.id)" style="cursor: pointer">
@@ -139,13 +143,11 @@
                         <span class="glyphicon glyphicon-exclamation-sign"></span>
                     </div>
                     <div class="container-fluid" style="margin-top: 10px"></div>
-                    <div ng-if="info.exercise.type == 'pd'" ng-include="'exercises/pd.html'"
-                         onload="exerciseNumber = $index; exercise = info.exercise"></div>
-                    <div ng-if="info.exercise.type == 'mc'" ng-include="'exercises/mc.html'"
-                         onload="exerciseNumber = $index; exercise = info.exercise"></div>
-                    <div ng-if="info.exercise.type == 'tf'" ng-include="'exercises/tf.html'"
-                         onload="exerciseNumber = $index; exercise = info.exercise"></div>
-                    <div onload="exerciseNumber = $index; exercise = info.exercise" ng-include="'exercises/extrapropertyview.html'"></div>
+                    <div ng-if="info.content.type == 'mc'" ng-include="'exercises/mc.html'"
+                         onload="exerciseNumber = $index; exercise = info"></div>
+                    <div ng-if="info.content.type == 'tf'" ng-include="'exercises/tf.html'"
+                         onload="exerciseNumber = $index; exercise = info"></div>
+                    <div onload="exerciseNumber = $index; exercise = info" ng-include="'exercises/extrapropertyview.html'"></div>
                 </div>
 
                 <div ng-show="activeExercise != $index" style="position: absolute; bottom: 10px; right: 50px">
